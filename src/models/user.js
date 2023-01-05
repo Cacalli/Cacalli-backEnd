@@ -30,7 +30,7 @@ const schema = new Schema({
     RecolectionInfo: {
         time: {type: Number, min: 0, max: 23},
         day: {type: Number, min: 1, max: 7},
-        zone: Number, //This also needs to be tested with reference to another object
+        zone: {type: mongoose.ObjectId, ref: "Zone"}, //This also needs to be tested with reference to another object
         last: Number, //Also needs to be tested
         status: Number, // 0: on time, 1: late
     },
