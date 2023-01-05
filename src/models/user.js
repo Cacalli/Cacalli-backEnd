@@ -17,7 +17,7 @@ const schema = new Schema({
         zipCode: {type: Number, required: true},
     },
     suscription: {
-        packages: [Number], //This one still needs to be tested with objects id for packages
+        packages: [{type: mongoose.ObjectId, ref: "Package"}], //This one still needs to be tested with objects id for packages
         status: {type: Number, min: 0, max: 2}, //State 0 is inactive, 1 is active and 2 is pending payment
         startDate: {type: Date, default: Date.now },
     },
