@@ -4,6 +4,7 @@ const config = require("./src/lib/config");
 const db = require("./src/lib/db");
 
 const User = require("./src/models/user").model;
+const Pickup= require("./src/models/pickup").model;
 
 
 app.use(express.json());
