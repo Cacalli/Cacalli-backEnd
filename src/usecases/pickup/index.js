@@ -6,26 +6,35 @@ const create=async(date,user)=>{
     return await newPickup.save();
 };
 
-const getNextPickup=async(user)=>{
-    await Pickup.find({user})
-}
+// const getNextPickup=async(user)=>{
+//     await Pickup.find({user})
+// }
 
-const getLastPickup = async ()=>{
+// const getPreviousPickup = async ()=>{
 
-}
+// }
 
+
+//Can work for an admin account, I believe this function would get pickups from all users
 const getAllPickups = async ()=>{
-
+   return await Pickup.find({}).exec(); 
 }
 
-const updatePickup = async ()=>{
-
+const getAllPickupsByUser=async (user)=>{
+    return await Pickup.find({user})
+}
+const updatePickup = async (id, date)=>{
+    return await Pickup.findByIdAndUpdate(id, {date})
 }
 
-const deletePickup= async ()=>{
-
+const deletePickup= async (id)=>{
+return await Pickup.findByIdAndDelete(id).exec();
 }
 
 module.exports={
-    create
+    create,
+    getAllPickups,
+    getAllPickupsByUser,
+    updatePickup,
+    deletePickup
 }
