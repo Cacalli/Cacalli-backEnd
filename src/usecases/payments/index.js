@@ -10,13 +10,17 @@ const Payment = require("../../models/payment").model;
  */
 
 const createPayment = async (data) => {
-  const { amount, status, date } = data;
-  const newPayment = new Payment({ amount, status, date });
+  const { amount, payment_status, date } = data;
+  const newPayment = new Payment({ amount, payment_status, date });
   return await newPayment.save();
 };
 const updatePayment = async (id, data) => {
   const { amount, status, date } = data;
-  return await Payment.findByIdAndUpdate(id, { amount, status, date }).exec();
+  return await Payment.findByIdAndUpdate(id, {
+    amount,
+    payment_status,
+    date,
+  }).exec();
 };
 
 const getAllPayments = async () => await Payment.find({});
