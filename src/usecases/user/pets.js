@@ -1,5 +1,3 @@
-const { update } = require(".");
-
 const User = require("../../models/user").model;
 
 const addPet = async (data) => {
