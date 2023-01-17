@@ -31,8 +31,8 @@ const schema = new Schema({
         time: {type: Number, min: 0, max: 23},
         day: {type: Number, min: 1, max: 7},
         zone: {type: mongoose.ObjectId, ref: "Zone"}, //This also needs to be tested with reference to another object
-        last: Number, //Also needs to be tested
-        status: Number, // 0: on time, 1: late
+        period: {type: Number, min: 1, max: 2},
+        status: {type: Number, min: 0, max: 2}
     },
 });
 
