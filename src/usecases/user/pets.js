@@ -1,8 +1,9 @@
 const User = require("../../models/user").model;
 
 const addPet = async (data) => {
-    const {user_id, pet_id, name, size, species} = data;
+    const {user_id, name, size, species} = data;
     const user = await User.findById(user_id);
+    const pet_id = getNextFreeId(user.pets)
     user.pets.push({pet_id, name, size, species});
     const new_pet_user = await User.findByIdAndUpdate(user_id, user);
     return new_pet_user;
@@ -39,6 +40,18 @@ const delPet = async (data) => {
     user.pets = user.pets.filter(item => item.name != name);
     const updated_user = await User.findByIdAndUpdate(user_id, user);
     return updated_user;
+};
+
+const getNextFreeId = (data) => {
+    const {petsArray} = data;
+    let testId = 0;
+    let found = false;
+    while(idTest <= petsArray.length && !found){
+        testId++;
+        const filteredArray = petsArray.filter(pet => pet.pet_id == testId);
+        found = filteredArray.length == 0;
+    }
+    return testId;
 };
 
 module.exports = {
