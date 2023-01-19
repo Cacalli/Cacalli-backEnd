@@ -30,7 +30,7 @@ const schema = new Schema({
         size: {type: Number, min:1, max:5}, //Sizes are 1:xs, 2:s, 3:m, 4:l, 5:xl
         species: {type: Number, min:1, max:3}, //species are 1:dog, 2:cat, 3:other
     }],
-    recolectionInfo: {
+    pickupInfo: {
         time: {type: Number, min: 0, max: 23},
         day: {type: Number, min: 1, max: 7},
         zone: {type: mongoose.ObjectId, ref: "Zone"}, //This also needs to be tested with reference to another object

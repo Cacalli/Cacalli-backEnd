@@ -1,5 +1,6 @@
-const mongoose= require("mongoose");
-const schema= new Schema({
+const mongoose = require("mongoose");
+
+const schema = new Schema({
 date:{type: Date, required: true },
 //temporary workoaround to validate
 user:{type: [Schema.Types.ObjectId], ref:"User"}

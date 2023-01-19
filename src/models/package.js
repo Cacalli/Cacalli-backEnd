@@ -7,6 +7,7 @@ const schema = new Schema({
     recolectionPeriod: {type: Number, min: 1, max: 2},
     fullPrice: Number,
     extraPrice: Number,
+    description: String,
 });
 
 const model = mongoose.model("Package", schema);
