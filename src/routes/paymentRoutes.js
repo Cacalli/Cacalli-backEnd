@@ -6,6 +6,7 @@ const {
   getPaymentById,
   getAllPayments,
   updatePayment,
+  getPaymentByDate,
   //delPayment,
 } = require("./../usecases/payments/index");
 
@@ -48,14 +49,17 @@ routes.get("/:id", async (req, res) => {
   }
 });
 
-//get payment by date
-//routes.get("/:date", async (req, res) => {
-//try {
-//validate date sent from query params with date from payment model (?)
-//if (req.params.date === date) {
-//}
-//} catch (error) {}
-//});
+// get payment by date
+routes.get("/", async (req, res) => {
+  const { date } = req.body;
+  try {
+    const payload = getPaymentByDate({ date });
+    res.json({ ok: true, payload });
+  } catch (error) {
+    const { message } = error;
+    res.status(404).json({ ok: true, message });
+  }
+});
 
 //update payment
 routes.put("/", async (req, res) => {
