@@ -20,23 +20,23 @@ app.listen(config.app.port, async () => {
   } catch (err) {
     console.error("Connection refused:", err);
   }
-  const user = new User({
-    email: "diegovm",
-    password: "asdf",
-    firstName: "Diego",
-    lastName: "Viganu",
-    phone: "12",
-    address: {
-      street: "pdte",
-      number: 1,
-      interior: 1,
-      neighborhood: "coyovia",
-      municipality: "coyo",
-      state: "cdmx",
-      zipCode: 4000,
-    },
-    suscription: { packages: ["63b79cb32e143062e61f0fd8"] },
-  });
-  const status = await user.save();
-  console.log(status, "este es el estado");
+  // const user = new User({
+  //   email: "diegovm",
+  //   password: "asdf",
+  //   firstName: "Diego",
+  //   lastName: "Viganu",
+  //   phone: "12",
+  //   address: {
+  //     street: "pdte",
+  //     number: 1,
+  //     interior: 1,
+  //     neighborhood: "coyovia",
+  //     municipality: "coyo",
+  //     state: "cdmx",
+  //     zipCode: 4000,
+  //   },
+  //   suscription: { packages: ["63b79cb32e143062e61f0fd8"] },
+  // });
+  // const status = await user.save();
+  // console.log(status, "este es el estado");
 });

@@ -7,7 +7,7 @@ const {
   getAllPayments,
   updatePayment,
   getPaymentByDate,
-  //delPayment,
+  delPayment,
 } = require("./../usecases/payments/index");
 
 //create payment
@@ -73,5 +73,27 @@ routes.put("/", async (req, res) => {
   }
 });
 
-//delete payment (?) should it be cancell payment
-//routes.delete("/:id", async (req, res) => {});
+//delete payment (cancelled payment)
+routes.delete("/:id", async (req, res) => {
+  try {
+    const payload = await delPayment(id);
+    res.json({ ok: true, payload });
+  } catch (error) {
+    const { message } = error;
+    res.status(404).json({ ok: true, message });
+  }
+});
+
+//get payment by date
+routes.get("/:date", async (req, res) => {
+  const { date } = req.params;
+  try {
+    const payload = await getPaymentByDate(date);
+  } catch (error) {
+    const { message } = error;
+    res.status(404).json({ ok: true, message });
+  }
+});
+
+//get most recent payment
+//(pending)
