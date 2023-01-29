@@ -1,5 +1,5 @@
 const User = require("../../models/user").model;
-const User = require("../../models/pickup").model;
+const Pickup = require("../../models/pickup").model;
 
 const getAllPayments = (data) => {
 

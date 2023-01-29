@@ -22,7 +22,7 @@ const schema = new Schema({
         startDate: {type: Date, default: Date.now },
     },
     pets: [{
-        pet_id: {type: Number},
+        petId: {type: Number},
         name: {type: String},
         size: {type: Number, min:1, max:5}, //Sizes are 1:xs, 2:s, 3:m, 4:l, 5:xl
         species: {type: Number, min:1, max:3}, //species are 1:dog, 2:cat, 3:other

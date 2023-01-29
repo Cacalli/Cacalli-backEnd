@@ -1,5 +1,5 @@
 const User = require("../../models/user").model;
-const Pickup = require("../../models/pickup").model;
+const pickup = require("../pickup")
 
 const getNextPickup = (data) => {
     
@@ -9,8 +9,9 @@ const getLastPickup = (data) => {
 
 };
 
-const getAllPickups = (data) => {
-
+const getAllPickups = (id) => {
+    const allPickups = pickup.getAllPickupsByUser(id);
+    return allPickups;
 };
 
 const getDaysBeforePickup = (data) => {
@@ -22,7 +23,7 @@ const getPickupStatus = (data) => {
 };
 
 const getPickupDay = (data) => {
-
+     
 };
 
 const getPickupTime = (data) => {
