@@ -5,8 +5,8 @@ const addSchedule = async (data) => {
     const zone = await Zone.findById(zoneId);
     // check it doesn't exists already
     zone.schedules.push({day, time});
-    const newSchedule = await User.findByIdAndUpdate(zoneId, zone);
-    return newSchedule;
+    const updatedZone = await Zone.findByIdAndUpdate(zoneId, zone);
+    return updatedZone;
 }; 
 
 const getSchedule = async (data) => {
@@ -27,7 +27,7 @@ const delSchedule = async (data) => {
     const {zoneId, day, time} = data;
     const zone = await Zone.findById(zoneId);
     zone.schedules = zone.schedules.filter(item => item.day != day || item.time != time);
-    const updatedZone = await User.findByIdAndUpdate(zoneId, zone);
+    const updatedZone = await Zone.findByIdAndUpdate(zoneId, zone);
     return updatedZone;
 };
 
