@@ -1,40 +1,58 @@
 const Pickup= require("../../models/pickup").model;
 
-const create=async(date,user)=>{
-    const newPickup= new Pickup({date,user});
-
+const create = async(data) => {
+    const {user, date} = data;
+    const newPickup= new Pickup({user, date, status: 4});
     return await newPickup.save();
 };
 
-// const getNextPickup=async(user)=>{
-//     await Pickup.find({user})
-// }
+const getAllPickups = async () => await Pickup.find({}).exec();
 
-// const getPreviousPickup = async ()=>{
-
-// }
-
-
-//Can work for an admin account, I believe this function would get pickups from all users
-const getAllPickups = async ()=>{
-   return await Pickup.find({}).exec(); 
+const getAllPickupsByUser = async (user) => {
+    const allPickups = await Pickup.find({user}).exec();
+    const orderedPickups = allPickups.sort((a,b) => {
+        return new Date(b.date) - new Date(a.date);
+    });
+    return orderedPickups;
 }
 
-const getAllPickupsByUser=async (user)=>{
-    return await Pickup.find({user})
-}
-const updatePickup = async (id, date)=>{
-    return await Pickup.findByIdAndUpdate(id, {date})
-}
+const updatePickup = async (id, data) => await Pickup.findByIdAndUpdate(id, data);
+ 
+const deletePickup = async (id) => await Pickup.findByIdAndDelete(id).exec(); 
+ 
+const getNextPickup = async(user) => {
+    const nextPickup = await Pickup.find({user, status: 3}).exec();
+    const pickups = await getAllPickupsByUser(user);
+    const nextPickup = pickups[0];
+    return nextPickup;
+};
 
-const deletePickup= async (id)=>{
-return await Pickup.findByIdAndDelete(id).exec();
-}
+const getLastPickup = async (user)=>{
+    const pickups = await getAllPickupsByUser(user);
+    const lastPickup = pickups[1];
+    return lastPickup;
+};
+
+const getPickupsByDate = async(date) => {
+    return await Pickup.find({date}).exec();
+};
+
+const cancelPickup = async (id) => await updatePickup(id, {status: 1});
+
+const delayPickup = async (id) => await updatePickup(id, {status: 2}); 
+
+const completePickup = async (id) => await updatePickup(id, {status: 4});
 
 module.exports={
     create,
     getAllPickups,
     getAllPickupsByUser,
     updatePickup,
-    deletePickup
-}
+    deletePickup,
+    getNextPickup,
+    getLastPickup,
+    getPickupsByDate,
+    cancelPickup,
+    delayPickup,
+    completePickup,
+};
