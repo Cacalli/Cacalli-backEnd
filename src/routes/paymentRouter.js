@@ -7,7 +7,7 @@ const {
   getAllPayments,
   updatePayment,
   //delPayment,
-} = require("./../usecases/payments/index");
+} = require("../usecases/payment/index");
 
 //create payment
 routes.post("/", async (req, res) => {
