@@ -1,4 +1,4 @@
-const Payment = require("../../models/payment").model;
+//const Payment = require("../../models/payment").model;
 
 /**
  * 1. create payment
@@ -10,31 +10,31 @@ const Payment = require("../../models/payment").model;
  * 7. get most recent payment
  */
 
-const createPayment = async (data) => {
-  const { amount, payment_status } = data;
-  const newPayment = new Payment({ amount, payment_status });
-  return await newPayment.save();
-};
-const updatePayment = async (id, data) => {
-  const { amount, payment_status, date } = data;
-  return await Payment.findByIdAndUpdate(id, {
-    amount,
-    payment_status,
-    date,
-  }).exec();
-};
+// const createPayment = async (data) => {
+//   const { amount, payment_status } = data;
+//   const newPayment = new Payment({ amount, payment_status });
+//   return await newPayment.save();
+// };
+// const updatePayment = async (id, data) => {
+//   const { amount, payment_status, date } = data;
+//   return await Payment.findByIdAndUpdate(id, {
+//     amount,
+//     payment_status,
+//     date,
+//   }).exec();
+// };
 
-const getAllPayments = async () => await Payment.find({});
-const getPaymentById = async (id) => await Payment.findById(id);
-const delPayment = async (id) => await Payment.findByIdAndDelete(id).exec();
-const getPaymentByDate = async (payment_date) =>
-  await Payment.find({ date: payment_date }).exec();
+// const getAllPayments = async () => await Payment.find({});
+// const getPaymentById = async (id) => await Payment.findById(id);
+// const delPayment = async (id) => await Payment.findByIdAndDelete(id).exec();
+// const getPaymentByDate = async (payment_date) =>
+//   await Payment.find({ date: payment_date }).exec();
 
-module.exports = {
-  createPayment,
-  updatePayment,
-  getAllPayments,
-  getPaymentById,
-  getPaymentByDate,
-  delPayment,
-};
+// module.exports = {
+//   createPayment,
+//   updatePayment,
+//   getAllPayments,
+//   getPaymentById,
+//   getPaymentByDate,
+//   delPayment,
+// };
