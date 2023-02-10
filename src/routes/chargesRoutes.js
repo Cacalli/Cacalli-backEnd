@@ -3,7 +3,11 @@ const routes = express.Router();
 
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
-//create a payment
+/**
+ * To charge a credit or a debit card, you create a Charge object. You can retrieve and refund individual charges as well as list all charges. Charges are identified by a unique, random ID.
+ */
+
+//create a charge
 routes.post("/checkout", async (req, res) => {
   const { amount, currency, source, description } = req.body;
 
@@ -16,9 +20,11 @@ routes.post("/checkout", async (req, res) => {
     });
 
     if (charge.status === "succeeded") {
-      res
-        .status(200)
-        .json({ ok: true, message: "payment successfull", payload: charge.id });
+      res.status(200).json({
+        ok: true,
+        message: "charge was successfull",
+        payload: charge.id,
+      });
     }
   } catch (error) {
     const { message } = error;
