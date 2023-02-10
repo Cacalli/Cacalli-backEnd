@@ -1,4 +1,6 @@
 const Zone = require("../../models/zone").model;
+const schedules = require("./schedules");
+const zipCodes = require("./zipCodes");
 
 const create = async (data) => {
     const {name} = data;
@@ -47,4 +49,6 @@ module.exports = {
     getZipCodes,
     getSchedules,
     checkZipCode,
+    schedules,
+    zipCodes,
 };

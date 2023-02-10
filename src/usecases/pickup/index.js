@@ -1,4 +1,4 @@
-const Pickup= require("../../models/pickup").model;
+const Pickup = require("../../models/pickup").model;
 
 const create = async(data) => {
     const {user, date} = data;

@@ -35,10 +35,17 @@ const removePackage = async (data) => {
     return updatedUser;
 };
 
-const calcTotalFee = async () => {
-    
-    return 1000;
-}
+const calcTotalFee = async (data) => {
+    const {userId} = data;
+    const user = await User.findById(userId);
+    const remainingPackages = user.packages;
+    const baseFee = remainingPackages.shift.fullPrice;
+    const totalFee = remainingPackages.reduce(
+        (total, package) => total + package.extraPrice,
+        baseFee
+    );
+    return totalFee
+};   
 
 const getNextFreeId = (data) => {
     const {packagesArray} = data;
@@ -54,9 +61,9 @@ const getNextFreeId = (data) => {
 
 
 module.exports = {
-    updateSubscription;
-    checkSubscriptionStatus;
-    addPackage;
-    removePackage;
-    calcTotalFee;
+    updateSubscription,
+    checkSubscriptionStatus,
+    addPackage,
+    removePackage,
+    calcTotalFee,
 };

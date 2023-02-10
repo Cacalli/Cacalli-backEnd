@@ -1,0 +1,20 @@
+account creation 
+	create_user
+register
+	register (zip code validation)
+	get schedules for zip code and validate zip code
+	validate zip code
+login
+	validate email-password
+	return token
+subscription
+	get all packages
+calculator
+	calculate ideal subscription
+	update subscription
+	add pet
+	del pet
+	update pet
+
+	add subscription
+	

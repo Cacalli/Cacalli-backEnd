@@ -34,8 +34,11 @@ const getLastPayment = async (userId) => {
   return lastPayment;
 }
 const getAllPayments = async () => await Payment.find({}).exec();
+
 const getPaymentById = async (id) => await Payment.findById(id).exec();
+
 const getPaymentsByUser = async (userId) => await Payment.find({user: userId}).exec();
+
 const delPayment = async (id) => await Payment.findByIdAndDelete(id).exec();
 
 
