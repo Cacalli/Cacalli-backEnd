@@ -2,7 +2,7 @@ const Pickup = require("../../models/pickup").model;
 
 const create = async(data) => {
     const {user, date} = data;
-    const newPickup= new Pickup({user, date, status: 4});
+    const newPickup= new Pickup({user, date, status: 3});
     return await newPickup.save();
 };
 

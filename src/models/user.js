@@ -29,7 +29,7 @@ const schema = new Schema({
     }],
     pickupInfo: {
         time: {type: Number, min: 0, max: 23},
-        day: {type: Number, min: 1, max: 7},
+        day: {type: Number, min: 0, max: 6},
         zone: {type: mongoose.ObjectId, ref: "Zone"}, //This also needs to be tested with reference to another object
           },
         });

@@ -1,32 +1,55 @@
-//Acualización de ecolecciones...
 const User = require("../../models/user").model;
 const pickup = require("../pickup")
 
-const getNextPickup = (id) => {
+const getNextPickup = async (id) => {
     const nextPickup = await pickup.getNextPickup(id);
     return nextPickup;
 };
 
-const getLastPickup = (id) => {
+const getLastPickup = async (id) => {
     const lastPickup = await pickup.getLastPickup(id);
     return lastPickup;
 };
 
-const getAllPickups = (id) => {
-    const allPickups = pickup.getAllPickupsByUser(id);
+const getAllPickups = async (id) => {
+    const allPickups = await pickup.getAllPickupsByUser(id);
     return allPickups;
 };
 
-const completePicup = (id) => {
-
+const completePickup = async (id) => {
+    const user = await User.findById(id);
+    const nextPickup = await pickup.getNextPickup(id);
+    await pickup.completePickup(nextPickup.id);
+    const pickupPeriod = user.pickupInfo.pickupPeriod;
+    const pickupDay = user.pickupInfo.day;
+    const newDate = getNextWeekDay(nextPickup.date, pickupDay);
+    if(pickupPeriod == 2){
+        newDate.setDate(newDate.getDate() + 7);
+    }
+    const newPickup = await pickup.create({id, newDate});
+    return newPickup;
 };
 
-const delayPickup = id => {
+const delayPickup = async (id) => {
+    const user = await User.findById(id);
+    const nextPickup = await pickup.getNextPickup(id);
+    await pickup.delayPickup(nextPickup.id);
+    const pickupDay = user.pickupInfo.day;
+    const newDate = getNextWeekDay(nextPickup.date, pickupDay);
+    const newPickup = await pickup.create({id, newDate});
+    return newPickup;
+};
 
+const getNextWeekDay = (date, weekDay) => {
+    const newDate = date;
+    newDate.setDate((7 - date.getDay() + weekDay) % 7 || 7);
+    return newDate;
 };
 
 module.exports = {
     getNextPickup,
     getLastPickup,
     getAllPickups,
+    completePickup,
+    delayPickup,fisica
 };
