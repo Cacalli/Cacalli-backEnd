@@ -28,6 +28,7 @@ routes.post("/paymentIntent", async (req, res) => {
 //retrieve a paymentIntent
 routes.get("/:id", async (req, res) => {
   const { id } = req.params;
+
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(id);
     res.status(200).json({
@@ -44,18 +45,35 @@ routes.get("/:id", async (req, res) => {
 //update a paymentIntent
 routes.put("/:id", async (req, res) => {
   const { id } = req.params;
+  const { amount, description } = req.body;
+
   try {
-    const paymentIntent = await stripe.paymentIntents.update(id, {
-      metadata: { order_id: "6735" },
+    const paymentIntentUpdated = await stripe.paymentIntents.update(id, {
+      //metadata: { order_id: "6735" },
+      amount,
+      description,
     });
-    res.status(200).json({ ok: true, payload: paymentIntent });
+    res.status(200).json({ ok: true, payload: paymentIntentUpdated });
   } catch (error) {
     const { message } = error;
     res.status(400).json({ ok: false, message });
   }
 });
 
-//cancel a paymentIntent [MISSING]
+//cancel a paymentIntent
+routes.post("/:id/cancel", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const paymentIntentCanceled = await stripe.paymentIntents.cancel(id);
+    if (paymentIntentCanceled.status === "canceled") {
+      res.status(201).json({ ok: true, payload: paymentIntentCanceled });
+    }
+  } catch (error) {
+    const { message } = error;
+    res.status(400).json({ ok: true, message });
+  }
+});
+
 //list all paymentsIntents
 routes.get("/", async (req, res) => {
   try {
@@ -63,6 +81,22 @@ routes.get("/", async (req, res) => {
       limit: 3,
     });
     res.status(200).json({ ok: true, payload: paymentIntents });
+  } catch (error) {
+    const { message } = error;
+    res.status(400).json({ ok: true, message });
+  }
+});
+
+//confirm pamentIntent
+routes.post("/:id/confirm", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const paymentIntentConfirm = await stripe.paymentIntents.confirm(id, {
+      payment_method: "pm_card_visa",
+    });
+    if (paymentIntentConfirm.status === "succeeded") {
+      res.status(200).json({ ok: true, payload: paymentIntentConfirm });
+    }
   } catch (error) {
     const { message } = error;
     res.status(400).json({ ok: true, message });

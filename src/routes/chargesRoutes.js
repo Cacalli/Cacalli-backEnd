@@ -32,7 +32,7 @@ routes.post("/checkout", async (req, res) => {
   }
 });
 
-//get payment by id
+//get charge by id
 routes.get("/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -45,7 +45,7 @@ routes.get("/:id", async (req, res) => {
   }
 });
 
-//get all payments
+//get all charges
 routes.get("/", async (req, res) => {
   try {
     const charges = await stripe.charges.list({
@@ -58,7 +58,7 @@ routes.get("/", async (req, res) => {
   }
 });
 
-//get payments by date
+//get charges by date
 routes.get("/", async (req, res) => {
   const { date } = req.body;
   try {
@@ -72,12 +72,13 @@ routes.get("/", async (req, res) => {
   }
 });
 
-//update payment
+//update charge
 /**No entiendo como actuliza la info del pago, ya que solo recibe como parametro el id del cliente */
 routes.put("/:id", async (req, res) => {
   const { id } = req.params;
+  const { amount, description } = req.body;
   try {
-    const charge = await stripe.charges.update(id);
+    const charge = await stripe.charges.update(id, { amount, description });
     res.status(200).json({ ok: true, payload: charge });
   } catch (error) {
     const { message } = error;
