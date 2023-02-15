@@ -1,14 +1,5 @@
 const Payment = require("../../models/payment").model;
 
-/**
- * 1. create payment
- * 2. update payment
- * 3. delete payment
- * 4. get payment by user (this use case goes in the user domain)
- * 5. get payment
- * 6. get all payments
- */
-
 const createPayment = async (data) => {
   const { amount, payment_status, date } = data;
   const newPayment = new Payment({ amount, payment_status, date });
