@@ -25,7 +25,6 @@ const completePickup = async (id) => {
     const pickupPeriod = await getPickupPeriod(id);
     const pickupDay = user.pickupInfo.day;
     const newDate = getNextWeekDay(nextPickup.date, pickupDay);
-    console.log(newDate);
     if(pickupPeriod == 2){
         newDate.setDate(newDate.getDate() + 7);
     }
