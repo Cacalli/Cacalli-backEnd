@@ -11,7 +11,7 @@ routes.get("/", async (req, res) => {
       res.json({ ok: true, payload });
     } catch (error) {
       const { message } = error;
-      res.status(400).json({ ok: false, message });
+      res.status(404).json({ ok: false, message });
     }
   });
   
