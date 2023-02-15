@@ -8,7 +8,7 @@ const apiRouter = (app) => {
   app.use("/charges", chargesRoutes);
   app.use("/paymentIntents", paymentIntentRoutes);
   app.use("/customers", customerRoutes);
-  app.use("./subscriptions", subscriptionRoutes);
+  app.use("/subscriptions", subscriptionRoutes);
 };
 
 module.exports = apiRouter;

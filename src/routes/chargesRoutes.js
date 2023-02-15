@@ -20,7 +20,7 @@ routes.post("/checkout", async (req, res) => {
     });
 
     if (charge.status === "succeeded") {
-      res.status(200).json({
+      res.status(201).json({
         ok: true,
         message: "charge was successfull",
         payload: charge.id,
