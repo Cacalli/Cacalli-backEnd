@@ -73,7 +73,6 @@ routes.get("/", async (req, res) => {
 });
 
 //update charge
-/**No entiendo como actuliza la info del pago, ya que solo recibe como parametro el id del cliente */
 routes.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { amount, description } = req.body;
