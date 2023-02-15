@@ -7,6 +7,7 @@ const schema = new Schema({
     pickupPeriod: {type: Number, min: 1, max: 2},
     fullPrice: Number,
     extraPrice: Number,
+    initialPrice: Number,
     description: String,
     picture: String,
 });

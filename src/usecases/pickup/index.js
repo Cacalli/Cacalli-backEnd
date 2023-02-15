@@ -21,15 +21,18 @@ const updatePickup = async (id, data) => await Pickup.findByIdAndUpdate(id, data
 const deletePickup = async (id) => await Pickup.findByIdAndDelete(id).exec(); 
  
 const getNextPickup = async(user) => {
-    const nextPickup = await Pickup.find({user, status: 3}).exec();
-    const pickups = await getAllPickupsByUser(user);
+    const pickups = await Pickup.find({user, status: 3}).exec();
+    //const pickups = await getAllPickupsByUser(user);
     const nextPickup = pickups[0];
     return nextPickup;
 };
 
 const getLastPickup = async (user)=>{
-    const pickups = await getAllPickupsByUser(user);
-    const lastPickup = pickups[1];
+    const pickups = await Pickup.find({user, status: 4});
+    const orderedPickups = pickups.sort((a,b) => {
+        return new Date(b.date) - new Date(a.date);
+    });
+    const lastPickup = pickups[0];
     return lastPickup;
 };
 

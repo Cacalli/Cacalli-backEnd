@@ -2,7 +2,9 @@ const User = require("../../models/user").model;
 const { hashPassword, verifyPassword } = require("../../lib/encrypt");
 const { createToken, verifyToken } = require("../../lib/jwt");
 const pets = require("./pets");
-const subscription = requie("./substription");
+const subscription = require("./subscription");
+const pickupInfo = require("./pickupInfo");
+const pickups = require ("./pickups");
 
 
 const create = async (data) => {
@@ -41,4 +43,6 @@ module.exports = {
     findByEmail,
     pets,
     subscription,
+    pickupInfo,
+    pickups,
 }

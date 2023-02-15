@@ -3,7 +3,7 @@ const User = require("../../models/user").model;
 const addPet = async (data) => {
     const {userId, name, size, species} = data;
     const user = await User.findById(userId);
-    const petId = getNextFreeId(user.pets)
+    const petId = getNextFreeId({petsArray: user.pets});
     user.pets.push({petId, name, size, species});
     const newPetUser = await User.findByIdAndUpdate(userId, user);
     return newPetUser;
