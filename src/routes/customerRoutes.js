@@ -5,13 +5,13 @@ const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 //create a customer
 routes.post("/", async (req, res) => {
-  const { name, email, phone, /*payment_method,*/ address } = req.body;
+  const { name, email, phone, payment_method, address } = req.body;
   try {
     const customer = await stripe.customers.create({
       name,
       email,
       phone,
-      //payment_method,
+      payment_method,
       address,
       description:
         "My First Test Customer (created for API docs at https://www.stripe.com/docs/api)",
@@ -36,7 +36,7 @@ routes.get("/:id", async (req, res) => {
 });
 
 //update customer
-routes.post("/:id", async (req, res) => {
+routes.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { name, email, phone, address } = req.body;
   try {
