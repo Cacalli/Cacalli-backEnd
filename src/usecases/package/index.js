@@ -10,6 +10,8 @@ const getById = async (id) => await Package.findById(id).exec();
 
 const getAll = async () => await Package.find({}).exec();
 
+const getByPeriod = async (period) => await Package.find({pickupPeriod: period}).exec();
+
 const update = async (id, data) => await Package.findByIdAndUpdate(id, data).exec();
 
 const del = async (id) => await Package.findByIdAndDelete(id).exec();
@@ -36,6 +38,7 @@ module.exports = {
     create,
     getById,
     getAll,
+    getByPeriod,
     update,
     del,
     getFullPrice, 

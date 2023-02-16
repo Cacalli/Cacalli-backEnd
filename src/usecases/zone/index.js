@@ -29,7 +29,8 @@ const getSchedules = async (id) => {
 };
 
 // Returns every zone where the zipCode is available
-const checkZipCode = async (zipCode) => {
+const checkZipCode = async (data) => {
+    const {zipCode} = data;
     const allZones = await Zone.find({});
     if(allZones.length > 0){
         const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipCode));

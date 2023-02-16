@@ -1,13 +1,12 @@
 const { Router } = require("express");
+const { getByPeriod } = require("../usecases/package");
+
 const routes = Router();
 
-const {
-    getAllPackages,
-} = require("../usecases/package/index");
-
 routes.get("/", async (req, res) => {
+    const period = parseInt(req.query.period);
     try {
-      const payload = await getAllPackages();
+      const payload = await getByPeriod(period);
       res.json({ ok: true, payload });
     } catch (error) {
       const { message } = error;
@@ -15,3 +14,4 @@ routes.get("/", async (req, res) => {
     }
   });
   
+module.exports = routes;

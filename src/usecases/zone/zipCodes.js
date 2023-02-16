@@ -9,13 +9,6 @@ const addZipCode = async (data) => {
     return updatedZone;
 }; 
 
-const getAllZipCodes = async (data) => {
-    const {zoneId} = data;
-    const zone = await Zone.findById(zoneId);
-    const zipCodes = zone.zipCodes;
-    return zipCodes;
-};
-
 const delZipCode = async (data) => {
     const {zoneId, code} = data;
     const zone = await Zone.findById(zoneId);
@@ -26,6 +19,5 @@ const delZipCode = async (data) => {
 
 module.exports = {
     addZipCode,
-    getAllZipCodes,
     delZipCode,
 };

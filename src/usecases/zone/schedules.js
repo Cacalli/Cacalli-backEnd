@@ -16,13 +16,6 @@ const getSchedule = async (data) => {
     return schedule;
 };
 
-const getAllSchedules = async (data) => {
-    const {zoneId} = data;
-    const zone = await Zone.findById(zoneId);
-    const schedules = zone.schedules;
-    return schedules;
-};
-
 const delSchedule = async (data) => {
     const {zoneId, day, time} = data;
     const zone = await Zone.findById(zoneId);
@@ -35,6 +28,5 @@ const delSchedule = async (data) => {
 module.exports = {
     addSchedule,
     getSchedule,
-    getAllSchedules,
     delSchedule,
 };
