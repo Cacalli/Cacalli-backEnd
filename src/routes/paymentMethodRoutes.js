@@ -5,15 +5,11 @@ const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 //create paymentMethod
 routes.post("/", async (req, res) => {
+  const { type, card } = req.body;
   try {
     const paymentMethod = await stripe.paymentMethods.create({
-      type: "card",
-      card: {
-        number: "4242424242424242",
-        exp_month: 8,
-        exp_year: 2020,
-        cvc: "314",
-      },
+      type,
+      card,
     });
     res.status(200).json({ ok: true, payload: paymentMethod });
   } catch (error) {
@@ -54,12 +50,48 @@ routes.get("/:id/:customerId", async (req, res) => {
 });
 
 //update paymntMethod
-routes.post("", async (req, res) => {});
+routes.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { billing_details, card, name, email, phone } = req.body;
+
+  try {
+    const paymentMethod = await stripe.paymentMethods.update(id, {
+      billing_details,
+      card,
+      name,
+      email,
+      phone,
+    });
+    res.status(200).json({ ok: true, payload: paymentMethod });
+  } catch (error) {
+    const { message } = error;
+    res.status(400).json({ ok: false, message });
+  }
+});
 
 //list paymentMethods
-routes.get("", async (req, res) => {});
+routes.get("/:customerId", async (req, res) => {
+  const { customerId } = req.params;
+  const { type } = req.body;
+  try {
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: customerId,
+      type,
+    });
+    res.status(200).json({ ok: true, payload: paymentMethods });
+  } catch (error) {
+    const { message } = error;
+    res.status(400).json({ ok: false, message });
+  }
+});
 
 //list a customer PaymentMethods
-routes.get("", async (req, res) => {});
+routes.get("", async (req, res) => {
+  try {
+  } catch (error) {
+    const { message } = error;
+    res.status(400).json({ ok: false, message });
+  }
+});
 
 module.exports = routes;
