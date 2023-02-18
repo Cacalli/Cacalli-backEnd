@@ -4,7 +4,6 @@ const package = require("../package");
 
 const getNextPickup = async (id) => {
     const nextPickup = await pickup.getNextPickup(id);
-    console.log(nextPickup)
     return nextPickup;
 };
 

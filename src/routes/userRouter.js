@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { create, authenticate, pets, subscription } = require("../usecases/user");
+const { create, authenticate, findById, pets, subscription, pickups } = require("../usecases/user");
 const { authHandler } = require("../middlewares/authHandler");
 
 const routes = Router();
@@ -13,6 +13,17 @@ routes.post("/", async (req, res) => {
     } catch (error) {
         const { message } = error;
         res.status(400).json({ ok: false, message });
+    }
+});
+
+routes.get("/", authHandler, async (req, res) => {
+    const userId = req.params.token.sub;
+    try {
+      const payload = await findById(userId);
+      res.status(202).json({ ok: true, payload });
+    } catch (error) {
+      const  { message } = error;
+      res.status(401).json({ ok: false, message });
     }
 });
 
@@ -78,6 +89,18 @@ routes.get("/totalFee", authHandler, async (req, res) => {
   }
 });
 
+routes.get("/initialFee", authHandler, async (req, res) => {
+  const userId = req.params.token.sub;
+
+  try {
+    const payload = await subscription.calcInitialFee({userId});
+    res.status(202).json({ ok: true, payload });
+  } catch (error) {
+    const { message } = error;
+    res.status(401).json({ ok: false, message });
+  }
+});
+
 routes.post("/package", authHandler, async (req, res) => {
   const userId = req.params.token.sub;
   const { packageId } = req.body;
@@ -108,7 +131,19 @@ routes.get("/allPackages", authHandler, async (req, res) => {
   const userId = req.params.token.sub;
 
   try {
-    const payload = await subscription.addPackage({userId, package: packageId});
+    const payload = await subscription.getAllPackages({userId});
+    res.status(202).json({ ok: true, payload });
+  } catch (error) {
+    const { message } = error;
+    res.status(401).json({ ok: false, message });
+  }
+});
+
+routes.get("/nextPickup", authHandler, async (req, res) => {
+  const userId = req.params.token.sub;
+  
+  try {
+    const payload = await pickups.getNextPickup(userId);
     res.status(202).json({ ok: true, payload });
   } catch (error) {
     const { message } = error;

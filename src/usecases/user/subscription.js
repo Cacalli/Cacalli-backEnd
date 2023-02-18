@@ -33,6 +33,18 @@ const removePackage = async (data) => {
     return updatedUser;
 };
 
+const getAllPackages = async (data) => {
+    const {userId} = data;
+    const user = await User.findById(userId);
+    const packagesIds = user.subscription.packages;
+    const packages = await Promise.all(
+        packagesIds.map( async (packageId) => {
+        return await packageUsecases.getById(packageId);
+        })
+    );
+    return packages;
+}
+
 const calcTotalFee = async (data) => {
     const {userId} = data;
     const user = await User.findById(userId);
@@ -69,6 +81,7 @@ module.exports = {
     checkSubscriptionStatus,
     addPackage,
     removePackage,
+    getAllPackages,
     calcTotalFee,
     calcInitialFee,
 };
