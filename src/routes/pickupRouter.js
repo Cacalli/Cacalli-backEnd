@@ -7,7 +7,7 @@ const {
   getAllPickupsByUser,
   updatePickup,
   deletePickup,
-} = require("../../usecases/pickup");
+} = require("../usecases/pickup");
 
 routes.get("/", async (req, res) => {
   try {

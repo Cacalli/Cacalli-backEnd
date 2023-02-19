@@ -1,12 +1,12 @@
 //Route handler
-const userRouter = require("./cacalliRoutes/userRouter");
-const zoneRouter = require("./cacalliRoutes/zoneRouter");
-const packageRouter = require("./cacalliRoutes/packageRouter");
-const chargesRoutes = require("./stripeRoutes/chargesRoutes");
-const paymentIntentRoutes = require("./stripeRoutes/paymentIntentsRoutes");
-const paymentMethodRoutes = require("./stripeRoutes/paymentMethodRoutes");
-const customerRoutes = require("./stripeRoutes/customerRoutes");
-const subscriptionRoutes = require("./stripeRoutes/subscriptionRoutes");
+const userRouter = require("./userRouter");
+const zoneRouter = require("./zoneRouter");
+const packageRouter = require("./packageRouter");
+const chargesRoutes = require("./chargesRoutes");
+const paymentIntentRoutes = require("./paymentIntentsRoutes");
+const paymentMethodRoutes = require("./paymentMethodRoutes");
+const customerRoutes = require("./customerRoutes");
+const subscriptionRoutes = require("./subscriptionRoutes");
 
 const apiRouter = (app) => {
   app.use("/user", userRouter);
