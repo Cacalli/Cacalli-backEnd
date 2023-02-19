@@ -9,6 +9,7 @@ const schema = new Schema({
   user: { type: [Schema.Types.ObjectId], ref: "User" },
 });
 
-const model = mongoose.model("Payment", schema);
 
-module.exports = { model, schema };
+// const model = mongoose.model("Payment", schema);
+
+// module.exports = { model, schema };
