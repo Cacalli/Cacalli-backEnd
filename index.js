@@ -19,10 +19,12 @@ app.listen(config.app.port, async () => {
 
   try {
     await db.connect();
-    console.log("DB is connected 🤠");
+    console.log("DB is connected 🤠")
+
   } catch (err) {
     console.error("Connection refused:", err);
   }
+
   // const user = new User({
   //   email: "diegovm",
   //   password: "asdf",
