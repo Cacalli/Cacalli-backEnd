@@ -8,7 +8,7 @@ const connect = () => {
     mongoose.connect(
       // `mongodb+srv://${user}:${password}@${host}/Cacalli?retryWrites=true&w=majority`
 
-      `mongodb+srv://${user}:${password}@${host}/cacalli?retryWrites=true&w=majority`
+      `mongodb+srv://${user}:${password}@${host}/Cacalli?retryWrites=true&w=majority`
     );
 
     const db = mongoose.connection;
