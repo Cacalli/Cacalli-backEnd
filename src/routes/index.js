@@ -5,7 +5,6 @@ const packageRouter = require("./cacalliRoutes/packageRouter");
 const chargesRoutes = require("./stripeRoutes/chargesRoutes");
 const paymentIntentRoutes = require("./stripeRoutes/paymentIntentsRoutes");
 const paymentMethodRoutes = require("./stripeRoutes/paymentMethodRoutes");
-const customerRoutes = require("./stripeRoutes/customerRoutes");
 const subscriptionRoutes = require("./stripeRoutes/subscriptionRoutes");
 
 const apiRouter = (app) => {
@@ -15,7 +14,6 @@ const apiRouter = (app) => {
   app.use("/charges", chargesRoutes);
   app.use("/paymentIntents", paymentIntentRoutes);
   app.use("/paymentMethod", paymentMethodRoutes);
-  app.use("/customers", customerRoutes);
   app.use("/subscriptions", subscriptionRoutes);
 };
 
