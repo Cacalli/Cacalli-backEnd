@@ -73,6 +73,16 @@ const authenticate = async (email, password) => {
   return createToken({ sub: user._id });
 };
 
+const addPaymentMethod = async (paymentMethodId, userId) => {
+  const user = await findById(userId);
+  const customer = user.customerStripeId;
+  const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
+    customer,
+  });
+
+  return paymentMethod;
+};
+
 module.exports = {
   create,
   findById,
@@ -84,4 +94,5 @@ module.exports = {
   subscription,
   pickupInfo,
   pickups,
+  addPaymentMethod,
 };
