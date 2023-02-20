@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { type } = require("os");
 const { Schema } = mongoose;
 
 const schema = new Schema({
@@ -36,6 +37,7 @@ const schema = new Schema({
     day: { type: Number, min: 0, max: 6 },
     zone: { type: mongoose.ObjectId, ref: "Zone" }, //This also needs to be tested with reference to another object
   },
+  paymentMethodStripeIds: [{ type: String }],
 });
 
 const model = mongoose.model("User", schema);
