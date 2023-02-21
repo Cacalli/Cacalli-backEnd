@@ -1,0 +1,45 @@
+User->
+    create user
+    get user
+    authenticate user
+    
+    pets->
+        addPet
+        removePet
+        allpets
+    
+    subscription->
+        totalFee
+        addPackage
+        removePackage
+        getAllPackages 
+
+    pickup->
+        nextPickup
+
+Package->
+    get (params:weekly o biweekly) 
+
+Zone->
+    checkZipCode !Not finished
+
+pickup->
+
+
+
+
+check zip code
+
+
+
+
+
+
+
+
+
+
+
+faltan getPacakges del usuario
+falta getPacakgesWeekly
+falta getPackagesBiweekly
