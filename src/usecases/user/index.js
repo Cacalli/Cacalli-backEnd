@@ -1,5 +1,3 @@
-//const express = require("express");
-
 const User = require("../../models/user").model;
 const { hashPassword, verifyPassword } = require("../../lib/encrypt");
 const { createToken, verifyToken } = require("../../lib/jwt");
@@ -7,9 +5,6 @@ const pets = require("./pets");
 const subscription = require("./subscription");
 const pickupInfo = require("./pickupInfo");
 const pickups = require("./pickups");
-
-//const routes = express.Router();
-
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const create = async (data) => {

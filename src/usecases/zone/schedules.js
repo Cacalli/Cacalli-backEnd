@@ -24,9 +24,45 @@ const delSchedule = async (data) => {
     return updatedZone;
 };
 
+const getDaysAvailable = async (data) => {
+    const {zipCode} = data;
+    const allZones = await Zone.find({});
+    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipCode));
+    const availableDays = [];
+    availableZones.forEach((zone) => {
+        zone.schedules.forEach((schedule) => {
+            if(!availableDays.includes(schedule.day)){
+                availableDays.push(schedule.day);
+            }
+        });
+    });
+    console.log(availableDays);
+    return availableDays;
+};
+
+const getSchedulesAvailable = async (data) => {
+    const {zipCode, day} = data;
+    const allZones = await Zone.find({});
+    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipCode));
+    const availableSchedules = [];
+    availableZones.forEach((zone) => {
+        zone.schedules.forEach((schedule) => {
+            if(schedule.day == day){
+                if(!availableSchedules.includes(schedule.time)){
+                    availableSchedules.push(schedule.time);
+                }
+            }
+        });
+    });
+    console.log(availableSchedules);
+    return availableSchedules;
+};
+
 
 module.exports = {
     addSchedule,
     getSchedule,
     delSchedule,
+    getDaysAvailable,
+    getSchedulesAvailable,
 };
