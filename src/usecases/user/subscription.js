@@ -1,5 +1,6 @@
 const User = require("../../models/user").model;
 const packageUsecases = require("../package");
+const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const addStripeSubscription = async (userId) => {
   const user = await User.findById(userId);
