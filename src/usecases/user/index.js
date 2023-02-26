@@ -65,7 +65,7 @@ const authenticate = async (email, password) => {
 
   const isVerified = await verifyPassword(password, hash);
   if (!isVerified) throw new Error("Wrong password");
-  return createToken({ sub: user._id });
+  return createToken({ sub: user._id, role: user.role });
 };
 
 const addPaymentMethod = async (paymentMethodId, userId) => {
