@@ -26,7 +26,7 @@ const create = async (data) => {
     product: productStripeId,
   });
 
-  const priceStripeId = price.Id;
+  const priceStripeId = price.id;
 
   const package = new Package({
     name,

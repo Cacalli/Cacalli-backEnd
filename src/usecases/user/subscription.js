@@ -2,19 +2,44 @@ const User = require("../../models/user").model;
 const packageUsecases = require("../package");
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
-const addStripeSubscription = async (userId) => {
+const addStripeSubscription = async (data) => {
+  const {userId,} = data;
   const user = await User.findById(userId);
   const customerId = user.customerStripeId;
-  const packages = getAllPackages();
+  const packages = await getAllPackages({userId});
   const packagesIds = packages.map((package) => {
-    package.priceStripeId;
+    return {price: package.priceStripeId};
   });
+  console.log(packagesIds); 
+  const priceId = "price_1MewjvByU3Lz8BC2n4gTYdwX";
   const subscription = await stripe.subscriptions.create({
     customer: customerId,
-    items: packagesIds,
+    items: [{price: priceId,}],
+    payment_behavior: 'default_incomplete', 
+    payment_settings: { save_default_payment_method: 'on_subscription' },
+    //expand: ['latest_invoice.payment_intent'],
   });
-  return subscription;
+  console.log(subscription);
+  console.log(subscription.data);
+  return({subscription: subscription.id, 
+          clientSecret: subscription.latest_invoice.payment_intent.client_secret,});
 };
+
+const createStripeCheckoutSession = async (data) => {
+  const {userId,} = data;
+  const packages = await getAllPackages({userId});
+  const packagesIds = packages.map((package) => {
+    return {price: package.priceStripeId, quantity: 1};
+  });
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    line_items: packagesIds,
+    success_url: 'https://example.com/success.html?session_id={CHECKOUT_SESSION_ID}',
+    cancel_url: 'https://example.com/canceled.html',
+  });
+  return session.url;
+};
+
 
 const updateSubscription = async (data) => {
   const { userId, status, startDate } = data;
@@ -97,4 +122,5 @@ module.exports = {
   calcTotalFee,
   calcInitialFee,
   addStripeSubscription,
+  createStripeCheckoutSession,
 };
