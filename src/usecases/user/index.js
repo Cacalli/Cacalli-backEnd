@@ -59,13 +59,16 @@ const update = async (id, data) => await User.findByIdAndUpdate(id, data);
 
 const findByEmail = async (email) => await User.findOne({ email });
 
+const getAllClients = async () => await User.find({role: 'client'});
+
 const authenticate = async (email, password) => {
   const user = await findByEmail(email);
   const hash = user.password;
 
   const isVerified = await verifyPassword(password, hash);
   if (!isVerified) throw new Error("Wrong password");
-  return createToken({ sub: user._id, role: user.role });
+  const token = createToken({ sub: user._id, role: user.role });
+  return {token, role: user.role};
 };
 
 const addPaymentMethod = async (paymentMethodId, userId) => {
@@ -85,6 +88,7 @@ module.exports = {
   update,
   authenticate,
   findByEmail,
+  getAllClients,
   pets,
   subscription,
   pickupInfo,

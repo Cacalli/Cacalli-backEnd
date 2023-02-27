@@ -3,6 +3,7 @@ const {
   create,
   authenticate,
   findById,
+  getAllClients,
   pets,
   subscription,
   pickups,
@@ -61,12 +62,24 @@ routes.get("/", authHandler, async (req, res) => {
   }
 });
 
+routes.get("/all", authHandler, async (req, res) => {
+  const userId = req.params.token.sub;
+  try {
+    const payload = await getAllClients();
+    res.status(202).json({ ok: true, payload });
+  } catch (error) {
+    const { message } = error;
+    res.status(401).json({ ok: false, message });
+  }
+});
+
+
 routes.post("/auth", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const payload = await authenticate(email, password);
-    res.status(202).json({ ok: true, payload });
+    const result = await authenticate(email, password);
+    res.status(202).json({ ok: true, payload: result.token, role: result.role });
   } catch (error) {
     const { message } = error;
     res.status(401).json({ ok: false, message });
