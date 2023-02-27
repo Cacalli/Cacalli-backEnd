@@ -6,7 +6,6 @@ const {
 const routes = Router();
 
 routes.post('/stripe/subscription', async (req, res) => {
-
   try {
     const body = req.body;
     const signature = req.headers["stripe-signature"];

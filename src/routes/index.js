@@ -8,7 +8,7 @@ const apiRouter = (app) => {
   app.use("/user", userRouter);
   app.use("/zone", zoneRouter);
   app.use("/package", packageRouter);
-  app.use("/webhook", webhooksRouter);
+  app.use("/webhooks", webhooksRouter);
 };
 
 module.exports = apiRouter;
