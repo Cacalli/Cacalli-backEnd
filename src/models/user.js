@@ -38,6 +38,7 @@ const schema = new Schema({
     zone: { type: mongoose.ObjectId, ref: "Zone" }, //This also needs to be tested with reference to another object
   },
   paymentMethodStripeIds: [{ type: String }],
+  role:{type: String, default: 'client'}
 });
 
 const model = mongoose.model("User", schema);

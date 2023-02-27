@@ -2,18 +2,15 @@ const User = require("../../models/user").model;
 const packageUsecases = require("../package");
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
-const addStripeSubscription = async (userId) => {
-  const user = await User.findById(userId);
-  const customerId = user.customerStripeId;
-  const packages = getAllPackages();
-  const packagesIds = packages.map((package) => {
-    package.priceStripeId;
+const createStripeCheckoutSession = async (data) => {
+  const packages = await getCartPackages(data);
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    line_items: packages,
+    success_url: 'https://master.d1vpqfv7zfjmvo.amplifyapp.com/pago-exitoso',
+    cancel_url: 'https://master.d1vpqfv7zfjmvo.amplifyapp.com/pago-fallido',
   });
-  const subscription = await stripe.subscriptions.create({
-    customer: customerId,
-    items: packagesIds,
-  });
-  return subscription;
+  return session.url;
 };
 
 const updateSubscription = async (data) => {
@@ -60,6 +57,17 @@ const getAllPackages = async (data) => {
   return packages;
 };
 
+const getCartPackages = async (data) => {
+  const packagesIds = data.body;
+  const packages = await Promise.all(
+    packagesIds.map(async (packageId) => {
+      const package = await packageUsecases.getByPeriodAndSize(packageId);
+      return {price: package[0].priceStripeId, quantity: packageId.quantity};
+    })
+  );
+  return packages;
+};
+
 const calcTotalFee = async (data) => {
   const { userId } = data;
   const user = await User.findById(userId);
@@ -89,6 +97,7 @@ const calcInitialFee = async (data) => {
 };
 
 module.exports = {
+  createStripeCheckoutSession,
   updateSubscription,
   checkSubscriptionStatus,
   addPackage,
@@ -96,5 +105,4 @@ module.exports = {
   getAllPackages,
   calcTotalFee,
   calcInitialFee,
-  addStripeSubscription,
 };

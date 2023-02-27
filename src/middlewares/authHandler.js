@@ -2,7 +2,8 @@ const { verifyToken } = require("../lib/jwt");
 
 const authHandler = async (req, res, next) => {
   const { authorization } = req.headers;
-
+  //console.log(req);
+  console.log(req.originalUrl);
   const token = authorization.split(" ")[1];
   try {
     req.params.token = verifyToken(token);

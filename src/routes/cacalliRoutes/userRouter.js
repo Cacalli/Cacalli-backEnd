@@ -207,4 +207,20 @@ routes.post("/paymentMethod", authHandler, async (req, res) => {
   }
 });
 
+routes.post("/subscription", authHandler, async (req, res) => {
+  const userId = req.params.token.sub;
+  const body = req.body;
+
+  try {
+    const payload = await subscription.createStripeCheckoutSession({
+      userId,
+      body
+    });
+    res.status(202).json({ ok: true, payload });
+  } catch (error) {
+    const { message } = error;
+    res.status(401).json({ ok: false, message });
+  }
+});
+
 module.exports = routes;
