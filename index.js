@@ -16,7 +16,6 @@ apiRouter(app);
 
 // Ejecutando el servidor HTTP
 app.listen(config.app.port, async () => {
-  console.log(`Esuchando peticiones HTTP en el puerto ${config.app.port}`);
   mongoose.set("strictQuery", false);
 
   try {
