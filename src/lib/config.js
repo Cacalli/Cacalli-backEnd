@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { APP_PORT, APP_DB_HOST, APP_DB_PASSWORD, APP_DB_USER, APP_SECRET, APP_CONN_STR, STRIPE_SUBSCRIPTION_WEBHOOK_SINGING_SECRET, STRIPE_PRIVATE_KEY } =
+const { APP_PORT, APP_DB_HOST, APP_DB_PASSWORD, APP_DB_USER, APP_SECRET, APP_CONN_STR, STRIPE_SUBSCRIPTION_WEBHOOK_SIGNING_SECRET, STRIPE_PRIVATE_KEY } =
   process.env;
 
 const config = {
@@ -16,7 +16,7 @@ const config = {
     },
     stripe: {
       privateKey: STRIPE_PRIVATE_KEY,
-      subscriptionWebhookSigningSecret: STRIPE_SUBSCRIPTION_WEBHOOK_SINGING_SECRET,
+      subscriptionWebhookSigningSecret: STRIPE_SUBSCRIPTION_WEBHOOK_SIGNING_SECRET,
     },
 };
 

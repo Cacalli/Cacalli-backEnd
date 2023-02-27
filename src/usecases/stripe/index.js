@@ -2,9 +2,8 @@ const config = require("../../lib/config");
 const stripe = require("stripe")(config.stripe.privateKey);
 
 const stripeWebhookEvent = async (body, signature) => {
-  const webhookSecret = config.stripe.webhookSecret;
+  const webhookSecret = config.stripe.subscriptionWebhookSigningSecret;
   let event;
-
   if(webhookSecret) {
     try {
       event = stripe.webhooks.constructEvent(
@@ -12,17 +11,14 @@ const stripeWebhookEvent = async (body, signature) => {
         signature,
         webhookSecret
       );
-    } catch (err) {
-      return err;
-    } 
-    data = event.data;
-    eventType = event.type;   
-  } 
-  const eventType = event.type;
-  const data = event.data;
-  
-  console.log(event.data.object);
 
+    } catch (error) {
+      console.log(error);
+      return error;
+    } 
+  } 
+  const data = event.data;
+  const eventType = event.type;
   switch (eventType) {
     case 'checkout.session.completed':
 
@@ -110,7 +106,9 @@ const stripeWebhookEvent = async (body, signature) => {
     // ... handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);
+      return false;
   }
+  return true;
 };
 
 module.exports = {
