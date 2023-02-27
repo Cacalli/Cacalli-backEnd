@@ -7,8 +7,8 @@ const createStripeCheckoutSession = async (data) => {
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     line_items: packages,
-    success_url: 'https://example.com/success.html?session_id={CHECKOUT_SESSION_ID}',
-    cancel_url: 'https://example.com/canceled.html',
+    success_url: 'https://master.d1vpqfv7zfjmvo.amplifyapp.com/pago-exitoso',
+    cancel_url: 'https://master.d1vpqfv7zfjmvo.amplifyapp.com/pago-fallido',
   });
   return session.url;
 };
