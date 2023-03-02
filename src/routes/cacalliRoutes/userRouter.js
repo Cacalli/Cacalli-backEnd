@@ -18,15 +18,7 @@ routes.post("/", async (req, res) => {
     email,
     password,
     firstName,
-    lastName,
     phone,
-    street,
-    number,
-    interior,
-    neighborhood,
-    municipality,
-    state,
-    zipCode,
   } = req.body;
 
   try {
@@ -34,15 +26,7 @@ routes.post("/", async (req, res) => {
       email,
       password,
       firstName,
-      lastName,
       phone,
-      street,
-      number,
-      interior,
-      neighborhood,
-      municipality,
-      state,
-      zipCode,
     });
     res.json({ ok: true, payload });
   } catch (error) {

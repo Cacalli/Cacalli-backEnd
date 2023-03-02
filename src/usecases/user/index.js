@@ -12,41 +12,31 @@ const create = async (data) => {
     email,
     password,
     firstName,
-    lastName,
     phone,
-    street,
-    number,
-    interior,
-    neighborhood,
-    municipality,
-    state,
-    zipCode,
+
   } = data;
-  const address = {
-    street,
-    number,
-    interior,
-    neighborhood,
-    municipality,
-    state,
-    zipCode,
-  };
+  // const address = {
+  //   street,
+  //   number,
+  //   interior,
+  //   neighborhood,
+  //   municipality,
+  //   state,
+  //   zipCode,
+  // };
 
   const hash = await hashPassword(password);
-  const customer = await stripe.customers.create({
-    name: firstName + lastName,
-  });
+  // const customer = await stripe.customers.create({
+  //   name: firstName + lastName,
+  // });
 
-  const customerStripeId = customer.id;
+  // const customerStripeId = customer.id;
 
   const user = new User({
     email,
     password: hash,
     firstName,
-    lastName,
     phone,
-    address,
-    customerStripeId,
   });
   return await user.save();
 };
