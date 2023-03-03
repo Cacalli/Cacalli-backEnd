@@ -1,13 +1,13 @@
 const { Router } = require("express");
-const { checkZipCode, schedules } = require("../../usecases/zone");
+const { checkZipcode, schedules } = require("../../usecases/zone");
 
 const routes = Router();
 
-routes.get("/checkZipCode", async (req, res) => {
-  const { zipCode } = req.body;
+routes.get("/checkZipcode", async (req, res) => {
+  const { zipcode } = req.body;
 
   try {
-    const payload = await checkZipCode({ zipCode });
+    const payload = await checkZipcode({ zipcode });
     res.json({ ok: true, payload });
   } catch (error) {
     const { message } = error;
