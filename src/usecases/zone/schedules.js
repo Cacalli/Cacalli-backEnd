@@ -36,28 +36,48 @@ const getDaysAvailable = async (data) => {
             }
         });
     });
-    console.log(availableDays);
-    return availableDays;
+    const availableDaysTransformed = transformNumbersToDays(availableDays);
+    console.log(availableDaysTransformed);
+    return availableDaysTransformed;
 };
 
 const getSchedulesAvailable = async (data) => {
     const {zipCode, day} = data;
+    const dayNumber = transformDayToNumber(day);
     const allZones = await Zone.find({});
     const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipCode));
     const availableSchedules = [];
     availableZones.forEach((zone) => {
         zone.schedules.forEach((schedule) => {
-            if(schedule.day == day){
+            if(schedule.day == dayNumber){
                 if(!availableSchedules.includes(schedule.time)){
                     availableSchedules.push(schedule.time);
                 }
             }
         });
     });
-    console.log(availableSchedules);
-    return availableSchedules;
+    const availableSchedulesTransformed = transformNumbersToSchedules(availableSchedules);
+    return availableSchedulesTransformed;
 };
 
+const numbersDays = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+const numbersSchedules = ["02:00-07:00", "8:00-13:00", "16:00-21:00", "22:00-01:00"];
+   
+const transformNumbersToDays = (numbers) => {
+    const days = numbers.map(number => numbersDays[number - 1]);
+    return days;
+};
+
+const transformDayToNumber = (day) => {
+    const number = numbersDays.indexOf(day) + 1;
+    return number
+};
+
+const transformNumbersToSchedules = (numbers) => {
+    const schedules = numbers.map(number => numbersSchedules[number -1]);
+    return schedules;
+}
 
 module.exports = {
     addSchedule,

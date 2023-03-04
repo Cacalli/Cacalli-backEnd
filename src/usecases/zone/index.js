@@ -34,7 +34,8 @@ const checkZipcode = async (data) => {
     const allZones = await Zone.find({});
     if(allZones.length > 0){
         const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipcode));
-        return availableZones;
+        const isAvailable = availableZones.length > 0;
+        return {available: isAvailable};
     } 
     else {
         return null;
