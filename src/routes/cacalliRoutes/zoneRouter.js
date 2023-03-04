@@ -3,8 +3,8 @@ const { checkZipcode, schedules } = require("../../usecases/zone");
 
 const routes = Router();
 
-routes.get("/checkZipcode", async (req, res) => {
-  const { zipcode } = req.body;
+routes.get("/checkZipcode/:zipcode", async (req, res) => {
+  const { zipcode } = req.params;
 
   try {
     const payload = await checkZipcode({ zipcode });
