@@ -214,22 +214,6 @@ routes.get("/nextPickup", authHandler, async (req, res) => {
   }
 });
 
-routes.post("/paymentMethod", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-  const { paymentMethodId } = req.body;
-
-  try {
-    const payload = await addPaymentMethod({
-      userId,
-      paymentMethodId,
-    });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
 routes.post("/subscription", authHandler, async (req, res) => {
   const userId = req.params.token.sub;
   const body = req.body;

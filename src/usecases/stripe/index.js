@@ -1,5 +1,6 @@
 const config = require("../../lib/config");
 const stripe = require("stripe")(config.stripe.privateKey);
+const userUsecases = require("../user");
 
 const stripeWebhookEvent = async (body, signature) => {
   const webhookSecret = config.stripe.subscriptionWebhookSigningSecret;
@@ -18,6 +19,7 @@ const stripeWebhookEvent = async (body, signature) => {
     } 
   } 
   const data = event.data;
+  console.log(data);
   const eventType = event.type;
   switch (eventType) {
     case 'checkout.session.completed':
@@ -25,6 +27,7 @@ const stripeWebhookEvent = async (body, signature) => {
       break;
     case 'customer.created':
       const customerCreated = event.data.object;
+      await userUsecases.update()
       // Then define and call a function to handle the event customer.created
       break;
     case 'customer.subscription.created':
