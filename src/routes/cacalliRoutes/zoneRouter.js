@@ -15,7 +15,7 @@ routes.get("/checkZipcode/:zipcode", async (req, res) => {
   }
 });
 
-routes.get("/daysAvailable", async (req, res) => {
+routes.get("/daysAvailable/:zipcode", async (req, res) => {
   const { zipCode } = req.body;
 
   try {
@@ -29,7 +29,7 @@ routes.get("/daysAvailable", async (req, res) => {
 
 routes.get("/schedulesAvailable", async (req, res) => {
   const { zipCode, day } = req.body;
-  console.log('dia',day);
+  console.log("dia", day);
   try {
     const payload = await schedules.getSchedulesAvailable({ zipCode, day });
     res.json({ ok: true, payload });
