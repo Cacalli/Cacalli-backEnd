@@ -3,8 +3,9 @@ const { hashPassword, verifyPassword } = require("../../lib/encrypt");
 const { createToken, verifyToken } = require("../../lib/jwt");
 const pets = require("./pets");
 const subscription = require("./subscription");
-const pickupInfo = require("./pickupInfo");
+const usecasesPickupInfo = require("./pickupInfo");
 const pickups = require("./pickups");
+const zone = require("../zone");
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const create = async (data) => {
@@ -13,25 +14,9 @@ const create = async (data) => {
     password,
     firstName,
     phone,
-
   } = data;
-  // const address = {
-  //   street,
-  //   number,
-  //   interior,
-  //   neighborhood,
-  //   municipality,
-  //   state,
-  //   zipCode,
-  // };
 
   const hash = await hashPassword(password);
-  // const customer = await stripe.customers.create({
-  //   name: firstName + lastName,
-  // });
-
-  // const customerStripeId = customer.id;
-
   const user = new User({
     email,
     password: hash,
@@ -46,6 +31,14 @@ const findById = async (id) => await User.findById(id);
 const del = async (id) => await User.findByIdAndDelete(id);
 
 const update = async (id, data) => await User.findByIdAndUpdate(id, data);
+
+const complete = async (id, data) => {
+  const { address, pickupInfo } = data;
+  pickupInfo.day = await zone.schedules.transformDayToNumber(pickupInfo.day);
+  pickupInfo.time = await zone.schedules.transformScheduleToNumber(pickupInfo.time);
+  updatedUser = await update(id, { address, pickupInfo });
+  return updatedUser;
+}
 
 const findByEmail = async (email) => await User.findOne({ email });
 
@@ -76,12 +69,13 @@ module.exports = {
   findById,
   del,
   update,
+  complete,
   authenticate,
   findByEmail,
   getAllClients,
   pets,
   subscription,
-  pickupInfo,
+  usecasesPickupInfo,
   pickups,
   addPaymentMethod,
 };

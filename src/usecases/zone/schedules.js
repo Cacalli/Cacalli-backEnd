@@ -70,12 +70,17 @@ const transformNumbersToDays = (numbers) => {
 
 const transformDayToNumber = (day) => {
     const number = numbersDays.indexOf(day) + 1;
-    return number
+    return number;
 };
 
 const transformNumbersToSchedules = (numbers) => {
     const schedules = numbers.map(number => numbersSchedules[number -1]);
     return schedules;
+};
+
+const transformScheduleToNumber = (schedule) => {
+    const number = numbersSchedules.indexOf(schedule) + 1;
+    return number;
 }
 
 module.exports = {
@@ -84,4 +89,6 @@ module.exports = {
     delSchedule,
     getDaysAvailable,
     getSchedulesAvailable,
+    transformScheduleToNumber,
+    transformDayToNumber,
 };

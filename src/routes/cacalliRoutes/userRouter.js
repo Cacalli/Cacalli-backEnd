@@ -7,6 +7,7 @@ const {
   pets,
   subscription,
   pickups,
+  complete,
   addPaymentMethod,
 } = require("../../usecases/user");
 const { authHandler } = require("../../middlewares/authHandler");
@@ -32,6 +33,31 @@ routes.post("/", async (req, res) => {
   } catch (error) {
     const { message } = error;
     res.status(400).json({ ok: false, message });
+  }
+});
+
+routes.put("/complete", authHandler, async (req, res) => {
+  const {
+    street, 
+    number, 
+    interior, 
+    neighborhood, 
+    municipality, 
+    state, 
+    zipcode, 
+    time,
+    day,
+    zone
+  } = req.body;
+  const address = { street, number, interior, neighborhood, municipality, state, zipcode }
+  const pickupInfo = { time, day, zone };
+  const userId = req.params.token.sub;
+  try {
+    const payload = await complete(userId, { address, pickupInfo });
+    res.status(202).json({ ok:true, payload });
+  } catch (error) {
+    const { message } = error;
+    res.status(401).json({ ok: true, message });
   }
 });
 
