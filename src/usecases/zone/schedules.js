@@ -25,9 +25,9 @@ const delSchedule = async (data) => {
 };
 
 const getDaysAvailable = async (data) => {
-    const {zipCode} = data;
+    const {zipcode} = data;
     const allZones = await Zone.find({});
-    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipCode));
+    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipcode));
     const availableDays = [];
     availableZones.forEach((zone) => {
         zone.schedules.forEach((schedule) => {
@@ -37,15 +37,14 @@ const getDaysAvailable = async (data) => {
         });
     });
     const availableDaysTransformed = transformNumbersToDays(availableDays);
-    console.log(availableDaysTransformed);
     return availableDaysTransformed;
 };
 
 const getSchedulesAvailable = async (data) => {
-    const {zipCode, day} = data;
+    const {zipcode, day} = data;
     const dayNumber = transformDayToNumber(day);
     const allZones = await Zone.find({});
-    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipCode));
+    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipcode));
     const availableSchedules = [];
     availableZones.forEach((zone) => {
         zone.schedules.forEach((schedule) => {

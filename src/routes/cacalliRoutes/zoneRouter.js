@@ -15,11 +15,11 @@ routes.get("/checkZipcode/:zipcode", async (req, res) => {
   }
 });
 
-routes.get("/daysAvailable", async (req, res) => {
-  const { zipCode } = req.body;
+routes.get("/daysAvailable/:zipcode", async (req, res) => {
+  const { zipcode } = req.params;
 
   try {
-    const payload = await schedules.getDaysAvailable({ zipCode });
+    const payload = await schedules.getDaysAvailable({ zipcode });
     res.json({ ok: true, payload });
   } catch (error) {
     const { message } = error;
@@ -27,11 +27,11 @@ routes.get("/daysAvailable", async (req, res) => {
   }
 });
 
-routes.get("/schedulesAvailable", async (req, res) => {
-  const { zipCode, day } = req.body;
+routes.get("/schedulesAvailable/:zipcode/:day", async (req, res) => {
+  const { zipcode, day } = req.params;
   console.log('dia',day);
   try {
-    const payload = await schedules.getSchedulesAvailable({ zipCode, day });
+    const payload = await schedules.getSchedulesAvailable({ zipcode, day });
     res.json({ ok: true, payload });
   } catch (error) {
     const { message } = error;
