@@ -14,11 +14,12 @@ const createStripeCheckoutSession = async (data) => {
 };
 
 const updateSubscription = async (data) => {
-  const { userId, status, startDate } = data;
+  const { userId, status, startDate, subscriptionStripeId } = data;
   const user = await User.findById(userId);
-  user.subscription.status = status;
-  user.subscription.startDate = startDate;
-  const updatedUser = await User.findByIdAndUpdate(userId, user);
+  if(status) {user.subscription.status = status;}
+  if(startDate) {user.subscription.startDate = startDate;}
+  if(subscriptionStripeId) {user.subscription.subscriptionStripeId = subscriptionStripeId;}
+  const updatedUser = await User.findByIdAndUpdate(userId, user, { new: true });
   return updatedUser;
 };
 
@@ -33,7 +34,7 @@ const addPackage = async (data) => {
   const { userId, package } = data;
   const user = await User.findById(userId);
   user.subscription.packages.push(package);
-  const updatedUser = await User.findByIdAndUpdate(userId, user);
+  const updatedUser = await User.findByIdAndUpdate(userId, user, { new: true });
   return updatedUser;
 };
 
@@ -41,7 +42,7 @@ const removePackage = async (data) => {
   const { userId, packageIndex } = data;
   const user = await User.findById(userId);
   user.subscription.packages.splice(packageIndex, 1);
-  const updatedUser = await User.findByIdAndUpdate(userId, user);
+  const updatedUser = await User.findByIdAndUpdate(userId, user, { new: true });
   return updatedUser;
 };
 

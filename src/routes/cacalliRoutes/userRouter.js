@@ -37,7 +37,7 @@ routes.post("/", async (req, res) => {
 });
 
 routes.put("/complete", authHandler, async (req, res) => {
-  const {
+  let {
     street, 
     number, 
     interior, 
@@ -49,6 +49,9 @@ routes.put("/complete", authHandler, async (req, res) => {
     day,
     zone
   } = req.body;
+  number = parseInt(number);  
+  interior = parseInt(interior);
+  zipcode = parseInt(zipcode);
   const address = { street, number, interior, neighborhood, municipality, state, zipcode }
   const pickupInfo = { time, day, zone };
   const userId = req.params.token.sub;

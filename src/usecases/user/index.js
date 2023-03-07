@@ -30,7 +30,7 @@ const findById = async (id) => await User.findById(id);
 
 const del = async (id) => await User.findByIdAndDelete(id);
 
-const update = async (id, data) => await User.findByIdAndUpdate(id, data);
+const update = async (id, data) => await User.findByIdAndUpdate(id, data, {new: true});
 
 const complete = async (id, data) => {
   const { address, pickupInfo } = data;
@@ -41,6 +41,8 @@ const complete = async (id, data) => {
 }
 
 const findByEmail = async (email) => await User.findOne({ email });
+
+const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId })
 
 const getAllClients = async () => await User.find({role: 'client'});
 
@@ -72,6 +74,7 @@ module.exports = {
   complete,
   authenticate,
   findByEmail,
+  findByStripeId,
   getAllClients,
   pets,
   subscription,
