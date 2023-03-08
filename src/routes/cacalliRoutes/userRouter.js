@@ -6,7 +6,7 @@ const {
   pets,
   subscription,
   pickups,
-  addPaymentMethod,
+  complete,
 } = require("../../usecases/user");
 const { authHandler } = require("../../middlewares/authHandler");
 
@@ -17,15 +17,7 @@ routes.post("/", async (req, res) => {
     email,
     password,
     firstName,
-    lastName,
     phone,
-    street,
-    number,
-    interior,
-    neighborhood,
-    municipality,
-    state,
-    zipCode,
   } = req.body;
 
   try {
@@ -33,20 +25,40 @@ routes.post("/", async (req, res) => {
       email,
       password,
       firstName,
-      lastName,
       phone,
-      street,
-      number,
-      interior,
-      neighborhood,
-      municipality,
-      state,
-      zipCode,
     });
     res.json({ ok: true, payload });
   } catch (error) {
     const { message } = error;
     res.status(400).json({ ok: false, message });
+  }
+});
+
+routes.put("/complete", authHandler, async (req, res) => {
+  let {
+    street, 
+    number, 
+    interior, 
+    neighborhood, 
+    municipality, 
+    state, 
+    zipcode, 
+    time,
+    day,
+    zone
+  } = req.body;
+  number = parseInt(number);  
+  interior = parseInt(interior);
+  zipcode = parseInt(zipcode);
+  const address = { street, number, interior, neighborhood, municipality, state, zipcode }
+  const pickupInfo = { time, day, zone };
+  const userId = req.params.token.sub;
+  try {
+    const payload = await complete(userId, { address, pickupInfo });
+    res.status(202).json({ ok:true, payload });
+  } catch (error) {
+    const { message } = error;
+    res.status(401).json({ ok: true, message });
   }
 });
 
@@ -65,8 +77,8 @@ routes.post("/auth", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const payload = await authenticate(email, password);
-    res.status(202).json({ ok: true, payload });
+    const result = await authenticate(email, password);
+    res.status(202).json({ ok: true, payload: result.token, role: result.role });
   } catch (error) {
     const { message } = error;
     res.status(401).json({ ok: false, message });
@@ -111,74 +123,6 @@ routes.get("/allPets", authHandler, async (req, res) => {
   }
 });
 
-routes.get("/totalFee", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-
-  try {
-    const payload = await subscription.calcTotalFee({ userId });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-routes.get("/initialFee", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-
-  try {
-    const payload = await subscription.calcInitialFee({ userId });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-routes.post("/package", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-  const { packageId } = req.body;
-
-  try {
-    const payload = await subscription.addPackage({
-      userId,
-      package: packageId,
-    });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-routes.delete("/package", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-  const { packageId } = req.body;
-
-  try {
-    const payload = await subscription.removePackage({
-      userId,
-      package: packageId,
-    });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-routes.get("/allPackages", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-
-  try {
-    const payload = await subscription.getAllPackages({ userId });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
 routes.get("/nextPickup", authHandler, async (req, res) => {
   const userId = req.params.token.sub;
 
@@ -191,14 +135,14 @@ routes.get("/nextPickup", authHandler, async (req, res) => {
   }
 });
 
-routes.post("/paymentMethod", authHandler, async (req, res) => {
+routes.post("/subscription", authHandler, async (req, res) => {
   const userId = req.params.token.sub;
-  const { paymentMethodId } = req.body;
+  const body = req.body;
 
   try {
-    const payload = await addPaymentMethod({
+    const payload = await subscription.createStripeCheckoutSession({
       userId,
-      paymentMethodId,
+      body
     });
     res.status(202).json({ ok: true, payload });
   } catch (error) {

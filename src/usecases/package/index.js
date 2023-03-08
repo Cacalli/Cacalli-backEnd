@@ -26,7 +26,7 @@ const create = async (data) => {
     product: productStripeId,
   });
 
-  const priceStripeId = price.Id;
+  const priceStripeId = price.id;
 
   const package = new Package({
     name,
@@ -49,6 +49,13 @@ const getAll = async () => await Package.find({}).exec();
 
 const getByPeriod = async (period) =>
   await Package.find({ pickupPeriod: period }).exec();
+
+const getByPeriodAndSize = async (data) => {
+  const pickupPeriod = data.period;
+  const name = data.size.toLowerCase();
+  const package = await Package.find({ pickupPeriod, name });
+  return package;
+};
 
 const update = async (id, data) =>
   await Package.findByIdAndUpdate(id, data).exec();
@@ -78,6 +85,7 @@ module.exports = {
   getById,
   getAll,
   getByPeriod,
+  getByPeriodAndSize,
   update,
   del,
   getFullPrice,

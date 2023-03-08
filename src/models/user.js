@@ -6,17 +6,16 @@ const schema = new Schema({
   email: { type: String, required: true, trim: true, unique: true },
   password: { type: String, required: true, trim: true },
   firstName: { type: String, required: true, trim: true },
-  lastName: { type: String, trim: true },
   phone: { type: String, required: true, trim: true, unique: true },
-  customerStripeId: { type: String, required: true, trim: true, unique: true },
+  customerStripeId: { type: String, trim: true, unique: true },
   address: {
-    street: { type: String, required: true, trim: true },
-    number: { type: Number, required: true },
+    street: { type: String, trim: true },
+    number: { type: Number },
     interior: Number,
-    neighborhood: { type: String, required: true },
-    municipality: { type: String, required: true },
-    state: { type: String, required: true },
-    zipCode: { type: Number, required: true },
+    neighborhood: { type: String },
+    municipality: { type: String },
+    state: { type: String },
+    zipCode: { type: Number },
   },
   subscription: {
     packages: [{ type: mongoose.ObjectId, ref: "Package" }], //This one still needs to be tested with objects id for packages
@@ -38,6 +37,7 @@ const schema = new Schema({
     zone: { type: mongoose.ObjectId, ref: "Zone" }, //This also needs to be tested with reference to another object
   },
   paymentMethodStripeIds: [{ type: String }],
+  role:{type: String, default: 'client'}
 });
 
 const model = mongoose.model("User", schema);

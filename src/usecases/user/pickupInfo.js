@@ -45,22 +45,26 @@ const getPickupTime = async (id) => {
     return pickupTime
 };
 
-const setPickup = async (data) => {
-    const {userId, pickupDay, pickupTime} = data;
-    const user = await User.findById(userId);
-    let isPickupAvailable = false; 
-    const schedules = await zone.schedules.getAllSchedules({zoneId: user.pickupInfo.zone});
-    schedules.forEach(schedule => {
-        if(schedule.day == pickupDay && schedule.time == pickupTime) {
-            isPickupAvailable = true;
-        }
-    });
-    if(isPickupAvailable){
-        user.pickupInfo.day = pickupDay;
-        user.pickupInfo.time = pickupTime;
-        await User.findByIdAndUpdate(userId, user);
-    } 
-    return isPickupAvailable;
+const setPickup = async (userId, data) => {
+    const { time, day } = data;
+    // const user = await User.findById(userId);
+    // let isPickupAvailable = false; 
+    // const schedules = await zone.schedules.getAllSchedules({zoneId: user.pickupInfo.zone});
+    // schedules.forEach(schedule => {
+    //     if(schedule.day == pickupDay && schedule.time == pickupTime) {
+    //         isPickupAvailable = true;
+    //     }
+    // });
+    // if(isPickupAvailable){
+    //     user.pickupInfo.day = zone.schedules.transformDayToNumber(pickupDay);
+    //     user.pickupInfo.time = zone.schedules.transformScheduleToNumber(pickupTime);
+    //     await User.findByIdAndUpdate(userId, user);
+    // } 
+    // return isPickupAvailable;
+    user.pickupInfo.day = zone.schedules.transformDayToNumber(day);
+    user.pickupInfo.time = zone.schedules.transformScheduleToNumber(time);
+    const updatedUser = await User.findByIdAndUpdate(userId, user);
+    return updatedUser;
 };
 
 module.exports = {

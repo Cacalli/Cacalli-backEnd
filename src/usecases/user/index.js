@@ -3,8 +3,9 @@ const { hashPassword, verifyPassword } = require("../../lib/encrypt");
 const { createToken, verifyToken } = require("../../lib/jwt");
 const pets = require("./pets");
 const subscription = require("./subscription");
-const pickupInfo = require("./pickupInfo");
+const usecasesPickupInfo = require("./pickupInfo");
 const pickups = require("./pickups");
+const zone = require("../zone");
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const create = async (data) => {
@@ -12,41 +13,15 @@ const create = async (data) => {
     email,
     password,
     firstName,
-    lastName,
     phone,
-    street,
-    number,
-    interior,
-    neighborhood,
-    municipality,
-    state,
-    zipCode,
   } = data;
-  const address = {
-    street,
-    number,
-    interior,
-    neighborhood,
-    municipality,
-    state,
-    zipCode,
-  };
 
   const hash = await hashPassword(password);
-  const customer = await stripe.customers.create({
-    name: firstName + lastName,
-  });
-
-  const customerStripeId = customer.id;
-
   const user = new User({
     email,
     password: hash,
     firstName,
-    lastName,
     phone,
-    address,
-    customerStripeId,
   });
   return await user.save();
 };
@@ -55,9 +30,29 @@ const findById = async (id) => await User.findById(id);
 
 const del = async (id) => await User.findByIdAndDelete(id);
 
-const update = async (id, data) => await User.findByIdAndUpdate(id, data);
+const update = async (id, data) => await User.findByIdAndUpdate(id, data, {new: true});
+
+const complete = async (id, data) => {
+  const { address, pickupInfo } = data;
+  pickupInfo.day = await zone.schedules.transformDayToNumber(pickupInfo.day);
+  pickupInfo.time = await zone.schedules.transformScheduleToNumber(pickupInfo.time);
+  updatedUser = await update(id, { address, pickupInfo });
+  return updatedUser;
+}
 
 const findByEmail = async (email) => await User.findOne({ email });
+
+const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId })
+
+const getAllClients = async (role) => { 
+  const allUsers = await User.find({role: 'client'});
+  // if(role != 'admin'){
+  //   throw new Error('Admin credentials needed');
+  // } else {
+  //   allUsers = await User.find({role: 'client'});
+  // }
+  return allUsers;
+};
 
 const authenticate = async (email, password) => {
   const user = await findByEmail(email);
@@ -65,7 +60,8 @@ const authenticate = async (email, password) => {
 
   const isVerified = await verifyPassword(password, hash);
   if (!isVerified) throw new Error("Wrong password");
-  return createToken({ sub: user._id });
+  const token = createToken({ sub: user._id, role: user.role });
+  return {token, role: user.role};
 };
 
 const addPaymentMethod = async (paymentMethodId, userId) => {
@@ -83,11 +79,14 @@ module.exports = {
   findById,
   del,
   update,
+  complete,
   authenticate,
   findByEmail,
+  findByStripeId,
+  getAllClients,
   pets,
   subscription,
-  pickupInfo,
+  usecasesPickupInfo,
   pickups,
   addPaymentMethod,
 };
