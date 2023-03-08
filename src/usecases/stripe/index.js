@@ -1,5 +1,6 @@
 const config = require("../../lib/config");
 const stripe = require("stripe")(config.stripe.privateKey);
+const userUsecases = require("../user");
 
 const stripeWebhookEvent = async (body, signature) => {
   const webhookSecret = config.stripe.subscriptionWebhookSigningSecret;
@@ -13,7 +14,6 @@ const stripeWebhookEvent = async (body, signature) => {
       );
 
     } catch (error) {
-      console.log(error);
       return error;
     } 
   } 
@@ -25,10 +25,12 @@ const stripeWebhookEvent = async (body, signature) => {
       break;
     case 'customer.created':
       const customerCreated = event.data.object;
+      await addCustomerId(customerCreated);
       // Then define and call a function to handle the event customer.created
       break;
     case 'customer.subscription.created':
       const customerSubscriptionCreated = event.data.object;
+      await addSubscriptionId(customerSubscriptionCreated);
       // Then define and call a function to handle the event customer.subscription.created
       break;
     case 'customer.subscription.deleted':
@@ -111,6 +113,23 @@ const stripeWebhookEvent = async (body, signature) => {
   return true;
 };
 
+const addCustomerId = async (data) => {
+  const { id, email } = data;
+  const user = await userUsecases.findByEmail(email);
+  const userId = user.id;
+  const updatedUser = await userUsecases.update(userId, { customerStripeId: id });
+  return updatedUser;
+};
+
+const addSubscriptionId = async (data) => {
+  const { id, customer } = data;
+  const user = await userUsecases.findByStripeId(customer);
+  const userId = user.id;
+  const updatedUser = await userUsecases.subscription.updateSubscription({ userId, subscriptionStripeId: id });
+  return updatedUser;
+}
+
 module.exports = {
   stripeWebhookEvent,
 };
+
