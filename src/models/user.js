@@ -6,7 +6,6 @@ const schema = new Schema({
   email: { type: String, required: true, trim: true, unique: true },
   password: { type: String, required: true, trim: true },
   firstName: { type: String, required: true, trim: true },
-  lastName: { type: String, trim: true },
   phone: { type: String, required: true, trim: true, unique: true },
   customerStripeId: { type: String, trim: true, unique: true },
   address: {

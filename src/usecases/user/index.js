@@ -44,7 +44,15 @@ const findByEmail = async (email) => await User.findOne({ email });
 
 const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId })
 
-const getAllClients = async () => await User.find({role: 'client'});
+const getAllClients = async (role) => { 
+  const allUsers = await User.find({role: 'client'});
+  // if(role != 'admin'){
+  //   throw new Error('Admin credentials needed');
+  // } else {
+  //   allUsers = await User.find({role: 'client'});
+  // }
+  return allUsers;
+};
 
 const authenticate = async (email, password) => {
   const user = await findByEmail(email);

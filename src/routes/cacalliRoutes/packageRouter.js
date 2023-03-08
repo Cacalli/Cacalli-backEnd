@@ -3,8 +3,8 @@ const { getByPeriod, create } = require("../../usecases/package");
 
 const routes = Router();
 
-routes.get("/", async (req, res) => {
-  const period = parseInt(req.query.period);
+routes.get("/:period", async (req, res) => {
+  const period = parseInt(req.params.period);
   try {
     const payload = await getByPeriod(period);
     res.json({ ok: true, payload });

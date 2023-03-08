@@ -3,12 +3,10 @@ const {
   create,
   authenticate,
   findById,
-  getAllClients,
   pets,
   subscription,
   pickups,
   complete,
-  addPaymentMethod,
 } = require("../../usecases/user");
 const { authHandler } = require("../../middlewares/authHandler");
 
@@ -75,18 +73,6 @@ routes.get("/", authHandler, async (req, res) => {
   }
 });
 
-routes.get("/all", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-  try {
-    const payload = await getAllClients();
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-
 routes.post("/auth", async (req, res) => {
   const { email, password } = req.body;
 
@@ -130,74 +116,6 @@ routes.get("/allPets", authHandler, async (req, res) => {
 
   try {
     const payload = await pets.getAllPets({ userId });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-routes.get("/totalFee", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-
-  try {
-    const payload = await subscription.calcTotalFee({ userId });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-routes.get("/initialFee", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-
-  try {
-    const payload = await subscription.calcInitialFee({ userId });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-routes.post("/package", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-  const { packageId } = req.body;
-
-  try {
-    const payload = await subscription.addPackage({
-      userId,
-      package: packageId,
-    });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-routes.delete("/package", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-  const { packageId } = req.body;
-
-  try {
-    const payload = await subscription.removePackage({
-      userId,
-      package: packageId,
-    });
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
-routes.get("/allPackages", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-
-  try {
-    const payload = await subscription.getAllPackages({ userId });
     res.status(202).json({ ok: true, payload });
   } catch (error) {
     const { message } = error;
