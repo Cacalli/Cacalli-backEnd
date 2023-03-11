@@ -1,6 +1,6 @@
 const User = require("../../models/user").model;
 const { hashPassword, verifyPassword } = require("../../lib/encrypt");
-const { createToken, verifyToken } = require("../../lib/jwt");
+const { createToken } = require("../../lib/jwt");
 const pets = require("./pets");
 const subscription = require("./subscription");
 const usecasesPickupInfo = require("./pickupInfo");
@@ -42,17 +42,9 @@ const complete = async (id, data) => {
 
 const findByEmail = async (email) => await User.findOne({ email });
 
-const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId })
+const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId });
 
-const getAllClients = async (role) => { 
-  const allUsers = await User.find({role: 'client'});
-  // if(role != 'admin'){
-  //   throw new Error('Admin credentials needed');
-  // } else {
-  //   allUsers = await User.find({role: 'client'});
-  // }
-  return allUsers;
-};
+const getAllClients = async (role) => await User.find({role: 'client'});
 
 const authenticate = async (email, password) => {
   const user = await findByEmail(email);
