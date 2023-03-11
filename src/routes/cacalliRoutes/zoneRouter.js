@@ -38,4 +38,5 @@ routes.get("/schedulesAvailable/:zipcode/:day", async (req, res) => {
   }
 });
 
+
 module.exports = routes;

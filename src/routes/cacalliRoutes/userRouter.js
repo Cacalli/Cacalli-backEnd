@@ -2,11 +2,11 @@ const { Router } = require("express");
 const {
   create,
   authenticate,
-  findById,
   pets,
   subscription,
   pickups,
   complete,
+  getUserInfo,
 } = require("../../usecases/user");
 const { authHandler } = require("../../middlewares/authHandler");
 
@@ -45,13 +45,14 @@ routes.put("/complete", authHandler, async (req, res) => {
     zipcode, 
     time,
     day,
-    zone
+    zone,
+    instructions,
   } = req.body;
   number = parseInt(number);  
   interior = parseInt(interior);
   zipcode = parseInt(zipcode);
-  const address = { street, number, interior, neighborhood, municipality, state, zipcode }
-  const pickupInfo = { time, day, zone };
+  const address = { street, number, interior, neighborhood, municipality, state, zipcode };
+  const pickupInfo = { time, day, zone, instructions };
   const userId = req.params.token.sub;
   try {
     const payload = await complete(userId, { address, pickupInfo });
@@ -65,7 +66,8 @@ routes.put("/complete", authHandler, async (req, res) => {
 routes.get("/", authHandler, async (req, res) => {
   const userId = req.params.token.sub;
   try {
-    const payload = await findById(userId);
+    const payload = await getUserInfo(userId);
+
     res.status(202).json({ ok: true, payload });
   } catch (error) {
     const { message } = error;

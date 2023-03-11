@@ -23,7 +23,11 @@ const create = async (data) => {
     firstName,
     phone,
   });
-  return await user.save();
+  const newUser = await user.save();
+  const auth = await authenticate(email, password);
+  const newUserPayload = (({ email, firstName, phone }) => ({ email, firstName, phone }))(newUser);
+  const userAuthenticated = { ...auth, ...newUserPayload };
+  return userAuthenticated;
 };
 
 const findById = async (id) => await User.findById(id);
@@ -37,7 +41,12 @@ const complete = async (id, data) => {
   pickupInfo.day = await zone.schedules.transformDayToNumber(pickupInfo.day);
   pickupInfo.time = await zone.schedules.transformScheduleToNumber(pickupInfo.time);
   updatedUser = await update(id, { address, pickupInfo });
-  return updatedUser;
+  const updatedPickupInfoPretty = { time: zone.schedules.transformNumberToSchedule(updatedUser.pickupInfo.time), 
+                        day: zone.schedules.transformNumberToDay(updatedUser.pickupInfo.day),
+                        instructions: pickupInfo.instructions };
+  const updatedAddress = updatedUser.address;
+  const updatedUserPayload = { pickupInfo: updatedPickupInfoPretty, address: updatedAddress};
+  return updatedUserPayload;
 }
 
 const findByEmail = async (email) => await User.findOne({ email });
@@ -55,6 +64,15 @@ const authenticate = async (email, password) => {
   const token = createToken({ sub: user._id, role: user.role });
   return {token, role: user.role};
 };
+
+const getUserInfo = async (id) => {
+  const user = await findById(id);
+  console.log(user);
+  returnInfo = (({ email, firstName, phone, address, pickupInfo, subscription }) => ({ email, firstName, phone, address, pickupInfo, subscription }))(user);
+
+  return returnInfo;
+}
+
 
 const addPaymentMethod = async (paymentMethodId, userId) => {
   const user = await findById(userId);
@@ -80,5 +98,7 @@ module.exports = {
   subscription,
   usecasesPickupInfo,
   pickups,
+  getUserInfo,
+
   addPaymentMethod,
 };

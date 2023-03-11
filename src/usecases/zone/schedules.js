@@ -81,7 +81,11 @@ const transformNumbersToSchedules = (numbers) => {
 const transformScheduleToNumber = (schedule) => {
     const number = numbersSchedules.indexOf(schedule) + 1;
     return number;
-}
+};
+
+const transformNumberToDay = (number) => numbersDays[number -1];
+
+const transformNumberToSchedule = (number) => numbersSchedules[number - 1];
 
 module.exports = {
     addSchedule,
@@ -91,4 +95,6 @@ module.exports = {
     getSchedulesAvailable,
     transformScheduleToNumber,
     transformDayToNumber,
+    transformNumberToSchedule,
+    transformNumberToDay,
 };
