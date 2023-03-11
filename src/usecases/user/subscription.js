@@ -14,11 +14,12 @@ const createStripeCheckoutSession = async (data) => {
 };
 
 const updateSubscription = async (data) => {
-  const { userId, status, startDate, subscriptionStripeId } = data;
+  const { userId, status, startDate, subscriptionStripeId, packages } = data;
   const user = await User.findById(userId);
   if(status) {user.subscription.status = status;}
   if(startDate) {user.subscription.startDate = startDate;}
   if(subscriptionStripeId) {user.subscription.subscriptionStripeId = subscriptionStripeId;}
+  if(packages) {user.subscription.packages = packages}
   const updatedUser = await User.findByIdAndUpdate(userId, user, { new: true });
   return updatedUser;
 };

@@ -1,6 +1,7 @@
 const config = require("../../lib/config");
 const stripe = require("stripe")(config.stripe.privateKey);
 const userUsecases = require("../user");
+const packageUsecases = require("../package");
 
 const stripeWebhookEvent = async (body, signature) => {
   const webhookSecret = config.stripe.subscriptionWebhookSigningSecret;
@@ -122,14 +123,18 @@ const addCustomerId = async (data) => {
 };
 
 const addSubscriptionId = async (data) => {
+  const items = data.items.data;
+  const newItems = items.map( async (item) => {
+    const dbItem = await packageUsecases.getByProductId(item.plan.product);
+    return {quantity: item.quanity, packageId: dbItem.id}
+  });
   const { id, customer } = data;
   const user = await userUsecases.findByStripeId(customer);
   const userId = user.id;
-  const updatedUser = await userUsecases.subscription.updateSubscription({ userId, subscriptionStripeId: id });
+  const updatedUser = await userUsecases.subscription.updateSubscription({ userId, subscriptionStripeId: id, packages: newItems, status: data.status, startDate: data.start_date });
   return updatedUser;
 }
 
 module.exports = {
   stripeWebhookEvent,
 };
-
