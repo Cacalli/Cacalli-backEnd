@@ -13,12 +13,7 @@ const { authHandler } = require("../../middlewares/authHandler");
 const routes = Router();
 
 routes.post("/", async (req, res) => {
-  const {
-    email,
-    password,
-    firstName,
-    phone,
-  } = req.body;
+  const { email, password, firstName, phone } = req.body;
 
   try {
     const payload = await create({
@@ -27,7 +22,16 @@ routes.post("/", async (req, res) => {
       firstName,
       phone,
     });
-    res.json({ ok: true, payload });
+
+    const { token } = await authenticate(email, password);
+
+    const payloadModfied = {
+      email: payload.email,
+      firstName: payload.firstName,
+      phone: payload.phone,
+      token,
+    };
+    res.json({ ok: true, payload: payloadModfied });
   } catch (error) {
     const { message } = error;
     res.status(400).json({ ok: false, message });
@@ -36,26 +40,34 @@ routes.post("/", async (req, res) => {
 
 routes.put("/complete", authHandler, async (req, res) => {
   let {
-    street, 
-    number, 
-    interior, 
-    neighborhood, 
-    municipality, 
-    state, 
-    zipcode, 
+    street,
+    number,
+    interior,
+    neighborhood,
+    municipality,
+    state,
+    zipcode,
     time,
     day,
-    zone
+    zone,
   } = req.body;
-  number = parseInt(number);  
+  number = parseInt(number);
   interior = parseInt(interior);
   zipcode = parseInt(zipcode);
-  const address = { street, number, interior, neighborhood, municipality, state, zipcode }
+  const address = {
+    street,
+    number,
+    interior,
+    neighborhood,
+    municipality,
+    state,
+    zipcode,
+  };
   const pickupInfo = { time, day, zone };
   const userId = req.params.token.sub;
   try {
     const payload = await complete(userId, { address, pickupInfo });
-    res.status(202).json({ ok:true, payload });
+    res.status(202).json({ ok: true, payload });
   } catch (error) {
     const { message } = error;
     res.status(401).json({ ok: true, message });
@@ -78,7 +90,9 @@ routes.post("/auth", async (req, res) => {
 
   try {
     const result = await authenticate(email, password);
-    res.status(202).json({ ok: true, payload: result.token, role: result.role });
+    res
+      .status(202)
+      .json({ ok: true, payload: result.token, role: result.role });
   } catch (error) {
     const { message } = error;
     res.status(401).json({ ok: false, message });
@@ -142,7 +156,7 @@ routes.post("/subscription", authHandler, async (req, res) => {
   try {
     const payload = await subscription.createStripeCheckoutSession({
       userId,
-      body
+      body,
     });
     res.status(202).json({ ok: true, payload });
   } catch (error) {
