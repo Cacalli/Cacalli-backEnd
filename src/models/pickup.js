@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const schema = new Schema({
   date: { type: Date, required: true },
   user: { type: Schema.Types.ObjectId, ref: "User" },
-  status: {type: Number, min: 1, max: 5}, 
+  status: {type: String}, 
 });
 
 const model = mongoose.model("Pickup", schema);

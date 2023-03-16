@@ -1,4 +1,5 @@
 const Pickup = require("../../models/pickup").model;
+const User = require("../../models/user").model;
 
 const create = async(data) => {
     const {user, date} = data;
@@ -6,7 +7,16 @@ const create = async(data) => {
     return await newPickup.save();
 };
 
-const getAllPickups = async () => await Pickup.find({}).exec();
+const getAllPickups = async () => {
+    const allPickups = await Pickup.find({}).exec();
+    const pickups = await Promise.all(
+            allPickups.map( async (pickup) => {
+                const user = await User.findById(pickup.user);
+                return { name: user.firstName, phone: user.phone, email: user.email, date: pickup.date, status: pickup.status };
+        })
+    );
+    return pickups;
+};
 
 const getAllPickupsByUser = async (user) => {
     const allPickups = await Pickup.find({user}).exec();
@@ -14,7 +24,7 @@ const getAllPickupsByUser = async (user) => {
         return new Date(b.date) - new Date(a.date);
     });
     return orderedPickups;
-}
+};
 
 const updatePickup = async (id, data) => await Pickup.findByIdAndUpdate(id, data);
  

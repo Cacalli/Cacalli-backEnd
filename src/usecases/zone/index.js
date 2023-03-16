@@ -1,11 +1,12 @@
 const Zone = require("../../models/zone").model;
 const schedules = require("./schedules");
-const zipCodes = require("./zipCodes");
+const zipcodes = require("./zipcodes");
 
 const create = async (data) => {
     const {name} = data;
     const zone = new Zone({name});
-    return await zone.save();
+    const newZone = await zone.save();
+    return newZone.name;
 };
 
 const getById = async (id) => await Zone.findById(id);
@@ -18,8 +19,8 @@ const del = async (id) => await Zone.findByIdAndDelete(id);
 
 const getZipcodes = async (id) => {
     const zone = await Zone.findById(id);
-    const zipCodes = zone.zipCodes;
-    return zipCodes;
+    const zipcodes = zone.zipcodes;
+    return zipcodes;
 };
 
 const getSchedules = async (id) => {
@@ -33,7 +34,7 @@ const checkZipcode = async (data) => {
     const {zipcode} = data;
     const allZones = await Zone.find({});
     if(allZones.length > 0){
-        const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipcode));
+        const availableZones = allZones.filter(zone => zone.zipcodes.includes(zipcode));
         const isAvailable = availableZones.length > 0;
         return {available: isAvailable};
     } 
@@ -52,5 +53,5 @@ module.exports = {
     getSchedules,
     checkZipcode,
     schedules,
-    zipCodes,
+    zipcodes,
 };
