@@ -1,13 +1,13 @@
 const { Router } = require("express");
-const { getAllClients } = require("../../usecases/user");
+const { getClients } = require("../../usecases/user");
 const { authHandler, authAdminHandler } = require ("../../middlewares/authHandler");
 
 const routes = Router();
 
 routes.get("/users", authHandler, authAdminHandler, async (req, res) => {
-    const userRole = req.params.token.role;
+    const { zone, day, time, status } = req.query;
     try {
-      const payload = await getAllClients(userRole);
+      const payload = await getClients({ zone, day, time, status });
       res.status(202).json({ ok: true, payload });
     } catch (error) {
       const { message } = error;

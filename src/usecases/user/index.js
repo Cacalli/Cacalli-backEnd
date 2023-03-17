@@ -5,7 +5,7 @@ const pets = require("./pets");
 const subscription = require("./subscription");
 const usecasesPickupInfo = require("./pickupInfo");
 const pickups = require("./pickups");
-const zone = require("../zone");
+const usecasesZone = require("../zone");
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const create = async (data) => {
@@ -53,7 +53,16 @@ const findByEmail = async (email) => await User.findOne({ email });
 
 const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId });
 
-const getAllClients = async (role) => await User.find({role: 'client'});
+const getClients = async (data) => {
+  const { zone, day, time, status } = data;
+  const dayNumber = usecasesZone.schedules.transformDayToNumber(day);
+  const timeNumber = usecasesZone.schedules.transformScheduleToNumber(time);
+  const zoneObject = await usecasesZone.getByName(zone);
+  const zoneId = zoneObject.id;
+  const clients = await User.find({role: 'client', 'pickupInfo.zone': zoneId, 'pickupInfo.time': timeNumber, 'pickupInfo.day': dayNumber});
+  return clients;
+}
+
 
 const authenticate = async (email, password) => {
   const user = await findByEmail(email);
@@ -67,9 +76,7 @@ const authenticate = async (email, password) => {
 
 const getUserInfo = async (id) => {
   const user = await findById(id);
-  console.log(user);
   returnInfo = (({ email, firstName, phone, address, pickupInfo, subscription }) => ({ email, firstName, phone, address, pickupInfo, subscription }))(user);
-
   return returnInfo;
 }
 
@@ -93,7 +100,7 @@ module.exports = {
   authenticate,
   findByEmail,
   findByStripeId,
-  getAllClients,
+  getClients,
   pets,
   subscription,
   usecasesPickupInfo,

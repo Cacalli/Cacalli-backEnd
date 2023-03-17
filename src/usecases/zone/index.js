@@ -11,6 +11,8 @@ const create = async (data) => {
 
 const getById = async (id) => await Zone.findById(id);
 
+const getByName = async (name) => await Zone.findOne({ name });
+
 const getAll = async ({}) => await Zone.find({});
 
 const update = async (id, data) => await Zone.findByIdAndUpdate(id, data);
@@ -29,7 +31,6 @@ const getSchedules = async (id) => {
     return schedules;
 };
 
-// Returns every zone where the zipCode is available
 const checkZipcode = async (data) => {
     const {zipcode} = data;
     const allZones = await Zone.find({});
@@ -46,6 +47,7 @@ const checkZipcode = async (data) => {
 module.exports = {
     create,
     getById,
+    getByName,
     getAll,
     update,
     del,
