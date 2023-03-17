@@ -6,6 +6,7 @@ const subscription = require("./subscription");
 const usecasesPickupInfo = require("./pickupInfo");
 const pickups = require("./pickups");
 const usecasesZone = require("../zone");
+const usecasesPackages = require("../package")
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const create = async (data) => {
@@ -38,11 +39,11 @@ const update = async (id, data) => await User.findByIdAndUpdate(id, data, {new: 
 
 const complete = async (id, data) => {
   const { address, pickupInfo } = data;
-  pickupInfo.day = await zone.schedules.transformDayToNumber(pickupInfo.day);
-  pickupInfo.time = await zone.schedules.transformScheduleToNumber(pickupInfo.time);
+  pickupInfo.day = await usecasesZone.schedules.transformDayToNumber(pickupInfo.day);
+  pickupInfo.time = await usecasesZone.schedules.transformScheduleToNumber(pickupInfo.time);
   updatedUser = await update(id, { address, pickupInfo });
-  const updatedPickupInfoPretty = { time: zone.schedules.transformNumberToSchedule(updatedUser.pickupInfo.time), 
-                        day: zone.schedules.transformNumberToDay(updatedUser.pickupInfo.day),
+  const updatedPickupInfoPretty = { time: usecasesZone.schedules.transformNumberToSchedule(updatedUser.pickupInfo.time), 
+                        day: usecasesZone.schedules.transformNumberToDay(updatedUser.pickupInfo.day),
                         instructions: pickupInfo.instructions };
   const updatedAddress = updatedUser.address;
   const updatedUserPayload = { pickupInfo: updatedPickupInfoPretty, address: updatedAddress};
@@ -60,7 +61,8 @@ const getClients = async (data) => {
   const zoneObject = await usecasesZone.getByName(zone);
   const zoneId = zoneObject.id;
   const clients = await User.find({role: 'client', 'pickupInfo.zone': zoneId, 'pickupInfo.time': timeNumber, 'pickupInfo.day': dayNumber});
-  return clients;
+  const mappedClients = clients //.map((client =>))
+  return mappedClients;
 }
 
 
@@ -76,10 +78,15 @@ const authenticate = async (email, password) => {
 
 const getUserInfo = async (id) => {
   const user = await findById(id);
+  user.subscription.packages = await Promise.all(
+    user.subscription.packages.map(async (package) => {
+      const packageInfo = await usecasesPackages.getById(package.packageId);
+      return { quantity: package.quantity, packageInfo };
+    })
+  );
   returnInfo = (({ email, firstName, phone, address, pickupInfo, subscription }) => ({ email, firstName, phone, address, pickupInfo, subscription }))(user);
   return returnInfo;
 }
-
 
 const addPaymentMethod = async (paymentMethodId, userId) => {
   const user = await findById(userId);

@@ -42,7 +42,8 @@ const delSchedule = async (data) => {
 const getDaysAvailable = async (data) => {
     const {zipcode} = data;
     const allZones = await Zone.find({});
-    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipcode));
+    console.log(allZones);
+    const availableZones = allZones.filter(zone => zone.zipcodes.includes(zipcode));
     const availableDays = [];
     availableZones.forEach((zone) => {
         zone.schedules.forEach((schedule) => {

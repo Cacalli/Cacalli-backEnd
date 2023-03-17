@@ -124,10 +124,12 @@ const addCustomerId = async (data) => {
 
 const addSubscriptionId = async (data) => {
   const items = data.items.data;
-  const newItems = items.map( async (item) => {
-    const dbItem = await packageUsecases.getByProductId(item.plan.product);
-    return {quantity: item.quanity, packageId: dbItem.id}
-  });
+  const newItems = await Promise.all(
+    items.map( async (item) => {
+      const dbItem = await packageUsecases.getByProductId(item.plan.product);
+      return {quantity: item.quantity, packageId: dbItem._id};
+    })
+  );
   const { id, customer } = data;
   const user = await userUsecases.findByStripeId(customer);
   const userId = user.id;
