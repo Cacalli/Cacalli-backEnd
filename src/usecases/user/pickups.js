@@ -42,7 +42,9 @@ const delayPickup = async (id) => {
 };
 
 const getNextWeekDay = (date, weekDay) => {
+    console.log('asdf', dage, weekDay);
     const newDate = date;
+    console.log(date.getDate(), weekDay);
     newDate.setDate(date.getDate() + ((7 - date.getDay() + weekDay) % 7 || 7));
     return newDate;
 };
@@ -53,6 +55,21 @@ const getPickupPeriod = async (id) => {
     const mainPackage = await package.getById(packageId);
     const pickupPeriod = mainPackage.pickupPeriod;
     return pickupPeriod;
+}
+
+const createFirstPickup = async (id) => {
+    const user = await User.findById(id);
+    const now = new Date();
+    console.log('antes');
+    console.log(user.pickupInfo.day);
+    let newDate = getNextWeekDay(now, user.pickupInfo.day);
+    console.log(newDate);
+    const pickupPeriod = await getPickupPeriod(id);
+    if(pickupPeriod == 2){
+        newDate = newDate + 7;
+    }
+    const newPickup = await pickup.create({user: id, date: newDate});
+    return newPickup;
 };
 
 module.exports = {
@@ -61,4 +78,5 @@ module.exports = {
     getAllPickups,
     completePickup,
     delayPickup,
+    createFirstPickup,
 };

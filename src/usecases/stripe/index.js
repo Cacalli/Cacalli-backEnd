@@ -134,6 +134,8 @@ const addSubscriptionId = async (data) => {
   const user = await userUsecases.findByStripeId(customer);
   const userId = user.id;
   const updatedUser = await userUsecases.subscription.updateSubscription({ userId, subscriptionStripeId: id, packages: newItems, status: data.status, startDate: data.start_date });
+  const firstPickup = await userUsecases.pickups.createFirstPickup(userId);
+  console.log(firstPickup);
   return updatedUser;
 }
 

@@ -63,7 +63,6 @@ const routes = Router();
  *                       type: string
  */
 routes.post("/", async (req, res) => {
-  console.log(req.body);
   const {
     email,
     password,

@@ -21,9 +21,7 @@ const updateSubscription = async (data) => {
   if(startDate) {user.subscription.startDate = formatDate;}
   if(subscriptionStripeId) {user.subscription.subscriptionStripeId = subscriptionStripeId;}
   if(packages) {user.subscription.packages = packages}
-  console.log(user.subscription.packages, user);
   const updatedUser = await User.findByIdAndUpdate(userId, user);
-  console.log(updatedUser);
   return updatedUser;
 };
 

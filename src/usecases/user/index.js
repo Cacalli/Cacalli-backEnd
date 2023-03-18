@@ -65,7 +65,6 @@ const getClients = async (data) => {
   return mappedClients;
 }
 
-
 const authenticate = async (email, password) => {
   const user = await findByEmail(email);
   const hash = user.password;
@@ -77,25 +76,20 @@ const authenticate = async (email, password) => {
 };
 
 const getUserInfo = async (id) => {
-  const user = await findById(id);
-  user.subscription.packages = await Promise.all(
+  let user = await findById(id);
+  const userPackages = await Promise.all(
     user.subscription.packages.map(async (package) => {
       const packageInfo = await usecasesPackages.getById(package.packageId);
-      return { quantity: package.quantity, packageInfo };
+      return { quantity: package.quantity, packageName: packageInfo.name };
     })
   );
-  returnInfo = (({ email, firstName, phone, address, pickupInfo, subscription }) => ({ email, firstName, phone, address, pickupInfo, subscription }))(user);
+  const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
+  const userSubscription = {packages: userPackages, startDate: user.subscription.startDate };
+  returnInfo = (({ email, firstName, phone, address }) => ({ email, firstName, phone, address }))(user);
+  returnInfo.subscription = userSubscription;
+  returnInfo.pickupInfo = userPickupInfo;
+  console.log(await pickups.getAllPickups(id));
   return returnInfo;
-}
-
-const addPaymentMethod = async (paymentMethodId, userId) => {
-  const user = await findById(userId);
-  const customer = user.customerStripeId;
-  const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
-    customer,
-  });
-
-  return paymentMethod;
 };
 
 module.exports = {
@@ -113,6 +107,4 @@ module.exports = {
   usecasesPickupInfo,
   pickups,
   getUserInfo,
-
-  addPaymentMethod,
 };
