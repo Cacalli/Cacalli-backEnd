@@ -60,7 +60,7 @@ const getSchedulesAvailable = async (data) => {
     const {zipcode, day} = data;
     const dayNumber = transformDayToNumber(day);
     const allZones = await Zone.find({});
-    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipcode));
+    const availableZones = allZones.filter(zone => zone.zipcodes.includes(zipcode));
     const availableSchedules = [];
     availableZones.forEach((zone) => {
         zone.schedules.forEach((schedule) => {
