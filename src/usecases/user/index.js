@@ -102,6 +102,10 @@ const getUserInfo = async (id) => {
   returnInfo = (({ email, firstName, phone, address }) => ({ email, firstName, phone, address }))(user);
   returnInfo.subscription = userSubscription;
   returnInfo.pickupInfo = userPickupInfo;
+  const payments = [{mes: 'enero', fecha: '03-01-2023', monto: '200', estado: 'completado', descarga: 'una URL'}, 
+  {mes: 'febrero', fecha: '03-02-2023', monto: '200', estado: 'completado', descarga: 'una URL'},
+  {mes: 'marzo', fecha: '03-03-2023', monto: '200', estado: 'completado', descarga: 'una URL'}];
+  returnInfo.payments = payments;
   return returnInfo;
 };
 
