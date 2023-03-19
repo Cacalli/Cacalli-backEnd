@@ -55,12 +55,22 @@ const findByEmail = async (email) => await User.findOne({ email });
 const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId });
 
 const getClients = async (data) => {
+  const query = {role: 'client'};
   const { zone, day, time, status } = data;
-  const dayNumber = usecasesZone.schedules.transformDayToNumber(day);
-  const timeNumber = usecasesZone.schedules.transformScheduleToNumber(time);
-  const zoneObject = await usecasesZone.getByName(zone);
-  const zoneId = zoneObject.id;
-  const clients = await User.find({role: 'client', 'pickupInfo.zone': zoneId, 'pickupInfo.time': timeNumber, 'pickupInfo.day': dayNumber});
+  if(day) {
+    const dayNumber = usecasesZone.schedules.transformDayToNumber(day);
+    query.pickupInfo.day = dayNumber;
+  }
+  if(time) {
+    const timeNumber = usecasesZone.schedules.transformScheduleToNumber(time);
+  }
+  if(zone) {
+    const zoneObject = await usecasesZone.getByName(zone);
+    const zoneId = zoneObject.id;
+    query.pickupInfo.zone = zoneId;
+  }
+  console.log(query);
+  const clients = await User.find(query);
   const mappedClients = clients //.map((client =>))
   return mappedClients;
 }
