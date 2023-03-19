@@ -93,8 +93,11 @@ const getUserInfo = async (id) => {
       return { quantity: package.quantity, packageName: packageInfo.name };
     })
   );
+  const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
   const nextPickup = await pickups.getNextPickup(id);
-  const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day), nextPickup: nextPickup.date };
+  if(nextPickup){
+    userPickupInfo.nextPickup = nextPickup.date;
+  }
   const userSubscription = {packages: userPackages, startDate: user.subscription.startDate };
   returnInfo = (({ email, firstName, phone, address }) => ({ email, firstName, phone, address }))(user);
   returnInfo.subscription = userSubscription;
