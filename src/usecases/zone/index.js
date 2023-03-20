@@ -33,7 +33,7 @@ const getByZipcodeAndSchedule = async (data) => {
     return validZone;
 };
 
-const getAll = async ({}) => await Zone.find({});
+const getAll = async () => await Zone.find({});
 
 const update = async (id, data) => await Zone.findByIdAndUpdate(id, data);
 
@@ -64,6 +64,42 @@ const checkZipcode = async (data) => {
     }
 };
 
+const getAvailableCombos = async (data) => {
+    const { day, time, zone } = data;
+    let zoneCheckArray = [];
+    zones = await getAll();
+    zones.forEach((zoneItem) => {
+        zoneItem.schedules.forEach((scheduleItem) => {
+            zoneCheckArray.push({name: zoneItem.name, day: scheduleItem.day, time: scheduleItem.time});
+        });
+    });
+    zoneCheckArray = zoneCheckArray.filter((item) => {
+        let valid = true;
+        if(zone){
+            valid = item.name == zone;
+        }
+        if(day && valid){
+            dayNumber = schedules.transformDayToNumber(day);
+            valid = item.day == dayNumber;
+        }
+        if(time && valid){
+            timeNumber = schedules.transformScheduleToNumber(time);
+            valid = item.time == timeNumber;
+        }
+        return valid;
+    });
+    let zonesReturn = [];
+    let daysReturn = [];
+    let timesReturn = [];
+    zoneCheckArray.forEach((item) => {
+        if(!zonesReturn.includes(item.name)){zonesReturn.push(item.name);}
+        if(!daysReturn.includes(item.day)){daysReturn.push(schedules.transformNumberToDay(item.day));}
+        if(!timesReturn.includes(item.time)){timesReturn.push(schedules.transformNumberToSchedule(item.time));}
+    });
+
+    return {zones: zonesReturn, days: daysReturn, times: timesReturn};
+};
+
 module.exports = {
     create,
     getById,
@@ -75,6 +111,7 @@ module.exports = {
     getZipcodes,
     getSchedules,
     checkZipcode,
+    getAvailableCombos,
     schedules,
     zipcodes,
 };

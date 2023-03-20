@@ -6,7 +6,8 @@ const subscription = require("./subscription");
 const usecasesPickupInfo = require("./pickupInfo");
 const pickups = require("./pickups");
 const usecasesZone = require("../zone");
-const usecasesPackages = require("../package")
+const usecasesPackages = require("../package");
+const usecasesInvoice = require("../invoice");
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const create = async (data) => {
@@ -103,6 +104,8 @@ const getUserInfo = async (id) => {
   returnInfo = (({ email, firstName, phone, address }) => ({ email, firstName, phone, address }))(user);
   returnInfo.subscription = userSubscription;
   returnInfo.pickupInfo = userPickupInfo;
+  const testPayments = await usecasesInvoice.getAllPaymentsByUser({userId: id});
+  console.log(testPayments);
   const payments = [{mes: 'enero', fecha: '03-01-2023', monto: '200', estado: 'completado', descarga: 'una URL'}, 
   {mes: 'febrero', fecha: '03-02-2023', monto: '200', estado: 'completado', descarga: 'una URL'},
   {mes: 'marzo', fecha: '03-03-2023', monto: '200', estado: 'completado', descarga: 'una URL'}];
