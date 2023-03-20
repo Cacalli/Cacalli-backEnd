@@ -41,6 +41,7 @@ const complete = async (id, data) => {
   const { address, pickupInfo } = data;
   pickupInfo.day = await usecasesZone.schedules.transformDayToNumber(pickupInfo.day);
   pickupInfo.time = await usecasesZone.schedules.transformScheduleToNumber(pickupInfo.time);
+  pickupInfo.zone = await usecasesZone.getByZipcodeAndSchedule({ day: pickupInfo.day, time: pickupInfo.time, zipcode:address.zipcode });
   updatedUser = await update(id, { address, pickupInfo });
   const updatedPickupInfoPretty = { time: usecasesZone.schedules.transformNumberToSchedule(updatedUser.pickupInfo.time), 
                         day: usecasesZone.schedules.transformNumberToDay(updatedUser.pickupInfo.day),
@@ -59,20 +60,20 @@ const getClients = async (data) => {
   const { zone, day, time, status } = data;
   if(day) {
     const dayNumber = usecasesZone.schedules.transformDayToNumber(day);
-    query.pickupInfo.day = dayNumber;
+    query['pickupInfo.day']= dayNumber;
   }
   if(time) {
     const timeNumber = usecasesZone.schedules.transformScheduleToNumber(time);
+    query['pickupInfo.time'] = timeNumber;
   }
   if(zone) {
     const zoneObject = await usecasesZone.getByName(zone);
-    const zoneId = zoneObject.id;
-    query.pickupInfo.zone = zoneId;
+    const zoneId = zoneObject._id;
+    query['pickupInfo.zone'] = zoneId;
   }
-  console.log(query);
   const clients = await User.find(query);
-  const mappedClients = clients //.map((client =>))
-  return mappedClients;
+  console.log(clients);
+  return clients;
 }
 
 const authenticate = async (email, password) => {

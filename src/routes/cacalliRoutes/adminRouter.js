@@ -18,6 +18,14 @@ const routes = Router();
  *           description: 
  *           schema:
  *             type: string
+ *         - in: query
+ *           name: day
+ *           schema:
+ *             type: string
+ *         - in: query
+ *           name: time
+ *           schema: 
+ *             type: string
  *     responses:
  *       200:
  *         description: A boolean variable indicating if there are any zones that include that zipcode.          
@@ -33,6 +41,7 @@ const routes = Router();
  */
 routes.get("/users", authHandler, authAdminHandler, async (req, res) => {
     const { zone, day, time, status } = req.query;
+    console.log(req.query);
     try {
       const payload = await getClients({ zone, day, time, status });
       res.status(202).json({ ok: true, payload });

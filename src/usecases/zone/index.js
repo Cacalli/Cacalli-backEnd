@@ -13,6 +13,26 @@ const getById = async (id) => await Zone.findById(id);
 
 const getByName = async (name) => await Zone.findOne({ name });
 
+const getByZipcodeAndSchedule = async (data) => {
+    const { zipcode, day, time } = data;
+    const allZones = await getAll({});
+    const validZone = allZones.find((zoneItem) => {
+        let valid = true;
+        if(zoneItem.zipcodes.includes(zipcode)){
+            valid = true;
+        }
+        zoneItem.schedules.forEach((schedule) => {
+            if(schedule.day == day && schedule.time == time) {
+                valid = true;
+            } else {
+                valid = false;
+            }
+        });
+        return valid;
+    });
+    return validZone;
+};
+
 const getAll = async ({}) => await Zone.find({});
 
 const update = async (id, data) => await Zone.findByIdAndUpdate(id, data);
@@ -48,6 +68,7 @@ module.exports = {
     create,
     getById,
     getByName,
+    getByZipcodeAndSchedule,
     getAll,
     update,
     del,
