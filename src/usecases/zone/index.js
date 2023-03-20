@@ -93,10 +93,11 @@ const getAvailableCombos = async (data) => {
     let timesReturn = [];
     zoneCheckArray.forEach((item) => {
         if(!zonesReturn.includes(item.name)){zonesReturn.push(item.name);}
-        if(!daysReturn.includes(item.day)){daysReturn.push(schedules.transformNumberToDay(item.day));}
-        if(!timesReturn.includes(item.time)){timesReturn.push(schedules.transformNumberToSchedule(item.time));}
-    });
+        if(!daysReturn.includes(schedules.transformNumberToDay(item.day))){daysReturn.push(schedules.transformNumberToDay(item.day));}
+        if(!timesReturn.includes(schedules.transformNumberToSchedule(item.time))){timesReturn.push(schedules.transformNumberToSchedule(item.time));}
+        console.log(timesReturn)
 
+    });
     return {zones: zonesReturn, days: daysReturn, times: timesReturn};
 };
 
