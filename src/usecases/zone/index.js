@@ -95,8 +95,6 @@ const getAvailableCombos = async (data) => {
         if(!zonesReturn.includes(item.name)){zonesReturn.push(item.name);}
         if(!daysReturn.includes(schedules.transformNumberToDay(item.day))){daysReturn.push(schedules.transformNumberToDay(item.day));}
         if(!timesReturn.includes(schedules.transformNumberToSchedule(item.time))){timesReturn.push(schedules.transformNumberToSchedule(item.time));}
-        console.log(timesReturn)
-
     });
     return {zones: zonesReturn, days: daysReturn, times: timesReturn};
 };

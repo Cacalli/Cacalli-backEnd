@@ -73,9 +73,8 @@ const getClients = async (data) => {
     query['pickupInfo.zone'] = zoneId;
   }
   const clients = await User.find(query);
-  console.log(clients);
   return clients;
-}
+};
 
 const authenticate = async (email, password) => {
   const user = await findByEmail(email);

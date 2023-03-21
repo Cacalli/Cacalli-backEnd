@@ -3,7 +3,7 @@ const User = require("../../models/user").model;
 
 const create = async(data) => {
     const {user, date} = data;
-    const newPickup= new Pickup({user, date, status: 3});
+    const newPickup= new Pickup({user, date, status: 'on time'});
     return await newPickup.save();
 };
 
@@ -29,10 +29,17 @@ const getAllPickupsByUser = async (user) => {
 const updatePickup = async (id, data) => await Pickup.findByIdAndUpdate(id, data);
  
 const deletePickup = async (id) => await Pickup.findByIdAndDelete(id).exec(); 
+
+const updateForToday = async () => {
+    const today = new Date();
+    await Pickup.updateMany(
+        { date: {$lt: today}, status: "on time"}, {status: "delayed"}
+    )
+}
  
 const getNextPickup = async(user) => {
-    const pickups = await Pickup.find({user, status: 3}).exec();
-    //const pickups = await getAllPickupsByUser(user);
+    console.log(user);
+    const pickups = await Pickup.find({user, status: 'on time'}).exec();
     const nextPickup = pickups[0];
     return nextPickup;
 };
@@ -50,11 +57,11 @@ const getPickupsByDate = async(date) => {
     return await Pickup.find({date}).exec();
 };
 
-const cancelPickup = async (id) => await updatePickup(id, {status: 1});
+const cancelPickup = async (id) => await updatePickup(id, {status: 'cancelled'});
 
-const delayPickup = async (id) => await updatePickup(id, {status: 2}); 
+const delayPickup = async (id) => await updatePickup(id, {status: 'delayed'}); 
 
-const completePickup = async (id) => await updatePickup(id, {status: 4});
+const completePickup = async (id) => await updatePickup(id, {status: 'complete'});
 
 module.exports={
     create,
@@ -62,6 +69,7 @@ module.exports={
     getAllPickupsByUser,
     updatePickup,
     deletePickup,
+    updateForToday,
     getNextPickup,
     getLastPickup,
     getPickupsByDate,
