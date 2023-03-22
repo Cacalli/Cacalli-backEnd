@@ -56,7 +56,7 @@ const getByPeriodAndSize = async (data) => {
   return package;
 };
 
-const getByProductId = async (productStripeId) => await Package.find({ productStripeId });
+const getByProductId = async (productStripeId) => await Package.findOne({ productStripeId });
 
 const update = async (id, data) => await Package.findByIdAndUpdate(id, data).exec();
 

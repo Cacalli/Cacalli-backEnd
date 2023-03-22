@@ -9,6 +9,39 @@ const {
   deletePickup,
 } = require("../../usecases/pickup");
 
+/**
+ * @swagger
+ * /pickup:
+ *   get:
+ *     summary: gets all pickups 
+ *     tags:
+ *       - pickup
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: An array of all the pickups made       
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 payload:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties: 
+ *                       name:
+ *                         type: string
+ *                       phone:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       date:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                   
+ */
 routes.get("/", async (req, res) => {
   try {
     const pickup = await getAllPickups();
@@ -18,6 +51,40 @@ routes.get("/", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /pickup/{id}:
+ *   get:
+ *     summary: gets all pickups 
+ *     parameters:
+ *         - in: path
+ *           name: id
+ *           required: true
+ *           description: 
+ *           schema: 
+ *             type: string
+ *     tags:
+ *       - pickup
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: An array of all the pickups made       
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 payload:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties: 
+ *                       date:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                   
+ */
 routes.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {

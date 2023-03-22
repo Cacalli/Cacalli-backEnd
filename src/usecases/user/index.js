@@ -5,7 +5,9 @@ const pets = require("./pets");
 const subscription = require("./subscription");
 const usecasesPickupInfo = require("./pickupInfo");
 const pickups = require("./pickups");
-const zone = require("../zone");
+const usecasesZone = require("../zone");
+const usecasesPackages = require("../package");
+const usecasesInvoice = require("../invoice");
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const create = async (data) => {
@@ -23,7 +25,11 @@ const create = async (data) => {
     firstName,
     phone,
   });
-  return await user.save();
+  const newUser = await user.save();
+  const auth = await authenticate(email, password);
+  const newUserPayload = (({ email, firstName, phone }) => ({ email, firstName, phone }))(newUser);
+  const userAuthenticated = { ...auth, ...newUserPayload };
+  return userAuthenticated;
 };
 
 const findById = async (id) => await User.findById(id);
@@ -34,17 +40,41 @@ const update = async (id, data) => await User.findByIdAndUpdate(id, data, {new: 
 
 const complete = async (id, data) => {
   const { address, pickupInfo } = data;
-  pickupInfo.day = await zone.schedules.transformDayToNumber(pickupInfo.day);
-  pickupInfo.time = await zone.schedules.transformScheduleToNumber(pickupInfo.time);
+  pickupInfo.day = await usecasesZone.schedules.transformDayToNumber(pickupInfo.day);
+  pickupInfo.time = await usecasesZone.schedules.transformScheduleToNumber(pickupInfo.time);
+  pickupInfo.zone = await usecasesZone.getByZipcodeAndSchedule({ day: pickupInfo.day, time: pickupInfo.time, zipcode:address.zipcode });
   updatedUser = await update(id, { address, pickupInfo });
-  return updatedUser;
+  const updatedPickupInfoPretty = { time: usecasesZone.schedules.transformNumberToSchedule(updatedUser.pickupInfo.time), 
+                        day: usecasesZone.schedules.transformNumberToDay(updatedUser.pickupInfo.day),
+                        instructions: pickupInfo.instructions };
+  const updatedAddress = updatedUser.address;
+  const updatedUserPayload = { pickupInfo: updatedPickupInfoPretty, address: updatedAddress};
+  return updatedUserPayload;
 }
 
 const findByEmail = async (email) => await User.findOne({ email });
 
 const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId });
 
-const getAllClients = async (role) => await User.find({role: 'client'});
+const getClients = async (data) => {
+  const query = {role: 'client'};
+  const { zone, day, time, status } = data;
+  if(day) {
+    const dayNumber = usecasesZone.schedules.transformDayToNumber(day);
+    query['pickupInfo.day']= dayNumber;
+  }
+  if(time) {
+    const timeNumber = usecasesZone.schedules.transformScheduleToNumber(time);
+    query['pickupInfo.time'] = timeNumber;
+  }
+  if(zone) {
+    const zoneObject = await usecasesZone.getByName(zone);
+    const zoneId = zoneObject._id;
+    query['pickupInfo.zone'] = zoneId;
+  }
+  const clients = await User.find(query);
+  return clients;
+};
 
 const authenticate = async (email, password) => {
   const user = await findByEmail(email);
@@ -56,14 +86,29 @@ const authenticate = async (email, password) => {
   return {token, role: user.role};
 };
 
-const addPaymentMethod = async (paymentMethodId, userId) => {
-  const user = await findById(userId);
-  const customer = user.customerStripeId;
-  const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
-    customer,
-  });
-
-  return paymentMethod;
+const getUserInfo = async (id) => {
+  let user = await findById(id);
+  const userPackages = await Promise.all(
+    user.subscription.packages.map(async (package) => {
+      const packageInfo = await usecasesPackages.getById(package.packageId);
+      return { quantity: package.quantity, packageName: packageInfo.name };
+    })
+  );
+  const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
+  const nextPickup = await pickups.getNextPickup(id);
+  if(nextPickup){
+    userPickupInfo.nextPickup = nextPickup.date;
+  }
+  const userSubscription = {packages: userPackages, startDate: user.subscription.startDate };
+  returnInfo = (({ email, firstName, phone, address }) => ({ email, firstName, phone, address }))(user);
+  returnInfo.subscription = userSubscription;
+  returnInfo.pickupInfo = userPickupInfo;
+  const testPayments = await usecasesInvoice.getAllPaymentsByUser({userId: id});
+  const payments = [{mes: 'enero', fecha: '03-01-2023', monto: '200', estado: 'completado', descarga: 'una URL'}, 
+  {mes: 'febrero', fecha: '03-02-2023', monto: '200', estado: 'completado', descarga: 'una URL'},
+  {mes: 'marzo', fecha: '03-03-2023', monto: '200', estado: 'completado', descarga: 'una URL'}];
+  returnInfo.payments = testPayments;
+  return returnInfo;
 };
 
 module.exports = {
@@ -75,10 +120,10 @@ module.exports = {
   authenticate,
   findByEmail,
   findByStripeId,
-  getAllClients,
+  getClients,
   pets,
   subscription,
   usecasesPickupInfo,
   pickups,
-  addPaymentMethod,
+  getUserInfo,
 };

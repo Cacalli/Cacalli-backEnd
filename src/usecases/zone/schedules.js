@@ -1,12 +1,15 @@
 const Zone = require("../../models/zone").model;
 
 const addSchedule = async (data) => {
-    const {zoneId, day, time} = data;
-    const zone = await Zone.findById(zoneId);
+    const { name, day, time } = data;
+    const dayNumber = transformDayToNumber(day);
+    const timeNumber = transformScheduleToNumber(time);
+    const zone = await Zone.findOne({ name });
     // check it doesn't exists already
-    zone.schedules.push({day, time});
+    zone.schedules.push({day: dayNumber, time: timeNumber});
+    const zoneId = zone.id;
     const updatedZone = await Zone.findByIdAndUpdate(zoneId, zone);
-    return updatedZone;
+    return {day, time};
 }; 
 
 const getSchedule = async (data) => {
@@ -16,18 +19,30 @@ const getSchedule = async (data) => {
     return schedule;
 };
 
+const getSchedules = async (data) => {
+    const { name } = data;
+    const zone = await Zone.findOne({name});
+    const mappedSchedules = zone.schedules.map((schedule) => {
+        const stringDay = transformNumberToDay(schedule.day);
+        const stringTime = transformNumberToSchedule(schedule.time);
+        return { day: stringDay, time: stringTime }
+    });
+    return mappedSchedules;
+}
+
 const delSchedule = async (data) => {
-    const {zoneId, day, time} = data;
-    const zone = await Zone.findById(zoneId);
-    zone.schedules = zone.schedules.filter(item => item.day != day || item.time != time);
-    const updatedZone = await Zone.findByIdAndUpdate(zoneId, zone);
-    return updatedZone;
+    const {name, day, time} = data;
+    const zone = await Zone.findOne({ name });
+    const zoneId = zone.id;
+    zone.schedules = zone.schedules.filter(item => item.day != transformDayToNumber(day) || item.time != transformScheduleToNumber(time));
+    await Zone.findByIdAndUpdate(zoneId, zone);
+    return { day, time };
 };
 
 const getDaysAvailable = async (data) => {
     const {zipcode} = data;
     const allZones = await Zone.find({});
-    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipcode));
+    const availableZones = allZones.filter(zone => zone.zipcodes.includes(zipcode));
     const availableDays = [];
     availableZones.forEach((zone) => {
         zone.schedules.forEach((schedule) => {
@@ -44,7 +59,7 @@ const getSchedulesAvailable = async (data) => {
     const {zipcode, day} = data;
     const dayNumber = transformDayToNumber(day);
     const allZones = await Zone.find({});
-    const availableZones = allZones.filter(zone => zone.zipCodes.includes(zipcode));
+    const availableZones = allZones.filter(zone => zone.zipcodes.includes(zipcode));
     const availableSchedules = [];
     availableZones.forEach((zone) => {
         zone.schedules.forEach((schedule) => {
@@ -81,14 +96,21 @@ const transformNumbersToSchedules = (numbers) => {
 const transformScheduleToNumber = (schedule) => {
     const number = numbersSchedules.indexOf(schedule) + 1;
     return number;
-}
+};
+
+const transformNumberToDay = (number) => numbersDays[number -1];
+
+const transformNumberToSchedule = (number) => numbersSchedules[number - 1];
 
 module.exports = {
     addSchedule,
     getSchedule,
+    getSchedules,
     delSchedule,
     getDaysAvailable,
     getSchedulesAvailable,
     transformScheduleToNumber,
     transformDayToNumber,
+    transformNumberToSchedule,
+    transformNumberToDay,
 };

@@ -7,7 +7,7 @@ const schema = new Schema({
   password: { type: String, required: true, trim: true },
   firstName: { type: String, required: true, trim: true },
   phone: { type: String, required: true, trim: true, unique: true },
-  customerStripeId: { type: String, trim: true, unique: true },
+  customerStripeId: { type: String, trim: true },
   address: {
     street: { type: String, trim: true },
     number: { type: Number },

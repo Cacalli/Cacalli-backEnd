@@ -2,6 +2,7 @@ const config = require("../../lib/config");
 const stripe = require("stripe")(config.stripe.privateKey);
 const userUsecases = require("../user");
 const packageUsecases = require("../package");
+const invoiceUsecases = require("../invoice");
 
 const stripeWebhookEvent = async (body, signature) => {
   const webhookSecret = config.stripe.subscriptionWebhookSigningSecret;
@@ -64,6 +65,7 @@ const stripeWebhookEvent = async (body, signature) => {
       break;
     case 'invoice.created':
       const invoiceCreated = event.data.object;
+      createPayment(invoiceCreated);
       // Then define and call a function to handle the event invoice.created
       break;
     case 'invoice.finalization_failed':
@@ -124,15 +126,27 @@ const addCustomerId = async (data) => {
 
 const addSubscriptionId = async (data) => {
   const items = data.items.data;
-  const newItems = items.map( async (item) => {
-    const dbItem = await packageUsecases.getByProductId(item.plan.product);
-    return {quantity: item.quanity, packageId: dbItem.id}
-  });
+  const newItems = await Promise.all(
+    items.map( async (item) => {
+      const dbItem = await packageUsecases.getByProductId(item.plan.product);
+      return {quantity: item.quantity, packageId: dbItem._id};
+    })
+  );
   const { id, customer } = data;
   const user = await userUsecases.findByStripeId(customer);
   const userId = user.id;
   const updatedUser = await userUsecases.subscription.updateSubscription({ userId, subscriptionStripeId: id, packages: newItems, status: data.status, startDate: data.start_date });
+  const firstPickup = await userUsecases.pickups.createFirstPickup(userId);
   return updatedUser;
+};
+
+const createPayment = async (data) => {
+  const { id, customer, created, total, status, invoice_pdf } = data;
+  let period = data.lines.data[0].period;
+  const user = await userUsecases.findByStripeId(customer);
+  const userId = user.id;
+  const newPayment = await invoiceUsecases.create({ userId, creationDate: created, total, status, pdf: invoice_pdf, period, paymentStripeId: id });
+  return newPayment;
 }
 
 module.exports = {
