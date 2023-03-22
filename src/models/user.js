@@ -15,7 +15,7 @@ const schema = new Schema({
     neighborhood: { type: String },
     municipality: { type: String },
     state: { type: String },
-    zipCode: { type: Number },
+    zipcode: { type: Number },
   },
   subscription: {
     packages: [{

@@ -8,7 +8,6 @@ const pickups = require("./pickups");
 const usecasesZone = require("../zone");
 const usecasesPackages = require("../package");
 const usecasesInvoice = require("../invoice");
-const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const create = async (data) => {
   const {
@@ -38,6 +37,10 @@ const del = async (id) => await User.findByIdAndDelete(id);
 
 const update = async (id, data) => await User.findByIdAndUpdate(id, data, {new: true});
 
+const findByEmail = async (email) => await User.findOne({ email });
+
+const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId });
+
 const complete = async (id, data) => {
   const { address, pickupInfo } = data;
   pickupInfo.day = await usecasesZone.schedules.transformDayToNumber(pickupInfo.day);
@@ -50,11 +53,7 @@ const complete = async (id, data) => {
   const updatedAddress = updatedUser.address;
   const updatedUserPayload = { pickupInfo: updatedPickupInfoPretty, address: updatedAddress};
   return updatedUserPayload;
-}
-
-const findByEmail = async (email) => await User.findOne({ email });
-
-const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId });
+};
 
 const getClients = async (data) => {
   const query = {role: 'client'};
@@ -72,7 +71,12 @@ const getClients = async (data) => {
     const zoneId = zoneObject._id;
     query['pickupInfo.zone'] = zoneId;
   }
-  const clients = await User.find(query);
+  let clients = await User.find(query);
+  clients = await Promise.all(
+    clients.map(async (client) => {
+      return makePretty(client);
+    })
+  );
   return clients;
 };
 
@@ -86,27 +90,35 @@ const authenticate = async (email, password) => {
   return {token, role: user.role};
 };
 
+const makePretty = async (user) => {
+    const userPackages = await Promise.all(
+      user.subscription.packages.map(async (package) => {
+        const packageInfo = await usecasesPackages.getById(package.packageId);
+        return { quantity: package.quantity, packageName: packageInfo.name, pickupPeriod: packageInfo.pickupPeriod };
+      })
+    );
+    const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
+    const nextPickup = await pickups.getNextPickup(user.id);
+    if(nextPickup){
+      userPickupInfo.nextPickup = nextPickup.date;
+      userPickupInfo.status = nextPickup.status;
+    }
+    const zone = await usecasesZone.getById(user.pickupInfo.zone);
+    userPickupInfo.zone = zone.name;
+    const userSubscription = {packages: userPackages, startDate: user.subscription.startDate };
+    let returnInfo = (({ email, firstName, phone, address }) => ({ email, firstName, phone, address }))(user);
+    returnInfo.subscription = userSubscription;
+    returnInfo.pickupInfo = userPickupInfo;
+    return returnInfo;
+  };
+
 const getUserInfo = async (id) => {
   let user = await findById(id);
-  const userPackages = await Promise.all(
-    user.subscription.packages.map(async (package) => {
-      const packageInfo = await usecasesPackages.getById(package.packageId);
-      return { quantity: package.quantity, packageName: packageInfo.name };
-    })
-  );
-  const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
-  const nextPickup = await pickups.getNextPickup(id);
-  if(nextPickup){
-    userPickupInfo.nextPickup = nextPickup.date;
-  }
-  const userSubscription = {packages: userPackages, startDate: user.subscription.startDate };
-  returnInfo = (({ email, firstName, phone, address }) => ({ email, firstName, phone, address }))(user);
-  returnInfo.subscription = userSubscription;
-  returnInfo.pickupInfo = userPickupInfo;
   const testPayments = await usecasesInvoice.getAllPaymentsByUser({userId: id});
-  const payments = [{mes: 'enero', fecha: '03-01-2023', monto: '200', estado: 'completado', descarga: 'una URL'}, 
-  {mes: 'febrero', fecha: '03-02-2023', monto: '200', estado: 'completado', descarga: 'una URL'},
-  {mes: 'marzo', fecha: '03-03-2023', monto: '200', estado: 'completado', descarga: 'una URL'}];
+  // const payments = [{mes: 'enero', fecha: '03-01-2023', monto: '200', estado: 'completado', descarga: 'una URL'}, 
+  // {mes: 'febrero', fecha: '03-02-2023', monto: '200', estado: 'completado', descarga: 'una URL'},
+  // {mes: 'marzo', fecha: '03-03-2023', monto: '200', estado: 'completado', descarga: 'una URL'}];
+  const returnInfo = await makePretty(user);
   returnInfo.payments = testPayments;
   return returnInfo;
 };
