@@ -114,7 +114,7 @@ routes.get("/zoneFilters", authHandler, authAdminHandler, async (req, res) => {
  *           schema: 
  *             type: object
  *             properties:
- *               user:
+ *               userEmail:
  *                 type: string
  *                 example: diego.vignau.manjarrez@gmail.com
  *              
@@ -140,7 +140,7 @@ routes.put("/pickup/complete", authHandler, authAdminHandler, async (req, res) =
       res.status(202).json({ ok: true, payload });
     } catch (error) {
       const { message } = error;
-      res.status(401).json({ ok: false, message });
+      res.status(404).json({ ok: false, message });
     }
 });
 
