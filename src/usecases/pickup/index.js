@@ -38,7 +38,6 @@ const updateForToday = async () => {
 }
  
 const getNextPickup = async(user) => {
-    console.log(user);
     const pickups = await Pickup.find({user, status: 'on time'}).exec();
     const nextPickup = pickups[0];
     return nextPickup;

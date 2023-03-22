@@ -104,11 +104,10 @@ const getUserInfo = async (id) => {
   returnInfo.subscription = userSubscription;
   returnInfo.pickupInfo = userPickupInfo;
   const testPayments = await usecasesInvoice.getAllPaymentsByUser({userId: id});
-  console.log(testPayments);
   const payments = [{mes: 'enero', fecha: '03-01-2023', monto: '200', estado: 'completado', descarga: 'una URL'}, 
   {mes: 'febrero', fecha: '03-02-2023', monto: '200', estado: 'completado', descarga: 'una URL'},
   {mes: 'marzo', fecha: '03-03-2023', monto: '200', estado: 'completado', descarga: 'una URL'}];
-  returnInfo.payments = payments;
+  returnInfo.payments = testPayments;
   return returnInfo;
 };
 
