@@ -27,10 +27,17 @@ const routes = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 payload:
+ *                 ok: 
  *                   type: boolean
- *                   description: The availability of a zone that includes de zipcode
- *                   example: false
+ *                   example: true
+ *                 payload:
+ *                   type: object
+ *                   description: response container
+ *                   properties:
+ *                     available:
+ *                       type: boolean
+ *                       description: The availability of a zone that includes de zipcode
+ *                       example: false
  */
 routes.get("/checkZipcode/:zipcode", async (req, res) => {
   const { zipcode } = req.params;
@@ -67,6 +74,9 @@ routes.get("/checkZipcode/:zipcode", async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   example: true
  *                 payload:
  *                   type: array
  *                   items: 

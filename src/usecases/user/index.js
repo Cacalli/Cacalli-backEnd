@@ -77,6 +77,9 @@ const getClients = async (data) => {
       return makePretty(client);
     })
   );
+  clients = clients.sort((a,b) => {
+    return new Date(a.pickupInfo.nextPickup) - new Date(b.pickupInfo.nextPickup);
+  })
   return clients;
 };
 
@@ -115,9 +118,6 @@ const makePretty = async (user) => {
 const getUserInfo = async (id) => {
   let user = await findById(id);
   const testPayments = await usecasesInvoice.getAllPaymentsByUser({userId: id});
-  // const payments = [{mes: 'enero', fecha: '03-01-2023', monto: '200', estado: 'completado', descarga: 'una URL'}, 
-  // {mes: 'febrero', fecha: '03-02-2023', monto: '200', estado: 'completado', descarga: 'una URL'},
-  // {mes: 'marzo', fecha: '03-03-2023', monto: '200', estado: 'completado', descarga: 'una URL'}];
   const returnInfo = await makePretty(user);
   returnInfo.payments = testPayments;
   return returnInfo;
