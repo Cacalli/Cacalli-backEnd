@@ -45,6 +45,10 @@ const swaggerDefinition = {
       url: 'http://localhost:8001',
       description: 'Development server',
     },
+    {
+      url: 'https://backend.cacalli.mx',
+      description: 'Deplpoy'
+    }
   ],
 };
 

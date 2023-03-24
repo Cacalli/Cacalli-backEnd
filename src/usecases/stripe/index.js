@@ -117,6 +117,7 @@ const stripeWebhookEvent = async (body, signature) => {
 };
 
 const addCustomerId = async (data) => {
+  console.log('new cosutmer')
   const { id, email } = data;
   const user = await userUsecases.findByEmail(email);
   const userId = user.id;

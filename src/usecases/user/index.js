@@ -16,7 +16,6 @@ const create = async (data) => {
     firstName,
     phone,
   } = data;
-
   const hash = await hashPassword(password);
   const user = new User({
     email,
@@ -94,12 +93,15 @@ const authenticate = async (email, password) => {
 };
 
 const makePretty = async (user) => {
-    const userPackages = await Promise.all(
-      user.subscription.packages.map(async (package) => {
-        const packageInfo = await usecasesPackages.getById(package.packageId);
-        return { quantity: package.quantity, packageName: packageInfo.name, pickupPeriod: packageInfo.pickupPeriod };
-      })
-    );
+    if(user.subscription.packages.lenght > 0){
+      const userPackages = await Promise.all(
+        user.subscription.packages.map(async (package) => {
+          const packageInfo = await usecasesPackages.getById(package.packageId);
+            return { quantity: package.quantity, packageName: packageInfo.name, pickupPeriod: packageInfo.pickupPeriod };
+        })
+      );
+    }
+    
     const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
     const nextPickup = await pickups.getNextPickup(user.id);
     if(nextPickup){
@@ -117,8 +119,11 @@ const makePretty = async (user) => {
 
 const getUserInfo = async (id) => {
   let user = await findById(id);
+  console.log(user);
   const testPayments = await usecasesInvoice.getAllPaymentsByUser({userId: id});
+  console.log(testPayments);
   const returnInfo = await makePretty(user);
+  console.log(returnInfo);
   returnInfo.payments = testPayments;
   return returnInfo;
 };

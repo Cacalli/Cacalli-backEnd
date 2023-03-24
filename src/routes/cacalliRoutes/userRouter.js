@@ -78,7 +78,6 @@ routes.post("/", async (req, res) => {
     firstName,
     phone,
   } = req.body;
-
   try {
     const payload = await create({
       email,
