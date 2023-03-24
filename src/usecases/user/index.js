@@ -104,9 +104,9 @@ const makePretty = async (user) => {
     const userSubscription = {packages: userPackages, startDate: user.subscription.startDate };
     returnInfo.subscription = userSubscription;
   }
-  if(user.pickupInfo != null) {
-  const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
-  const nextPickup = await pickups.getNextPickup(user.id);
+  if(user.pickupInfo.day) {
+    const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
+    const nextPickup = await pickups.getNextPickup(user.id);
     if(nextPickup){
       userPickupInfo.nextPickup = nextPickup.date;
       userPickupInfo.status = nextPickup.status;
