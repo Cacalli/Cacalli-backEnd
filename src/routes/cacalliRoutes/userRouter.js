@@ -34,12 +34,16 @@ const routes = Router();
  *             properties:
  *               email:
  *                 type: string
+ *                 example: diego.vignau.manjarrez@gmail.com
  *               password: 
  *                 type: string
+ *                 example: contraseña
  *               firstName: 
  *                 type: string
+ *                 example: Diego Vignau
  *               phone: 
  *                 type: string 
+ *                 example: 5514907030
  *     responses:
  *       200:
  *         description: An object with all the info of a user          
@@ -53,14 +57,19 @@ const routes = Router();
  *                   properties:
  *                     token: 
  *                       type: string
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NDFhYjljYmNiZDgyODMyYTcyNDkyZDEiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNjc5NDczMTAwLCJleHAiOjE2Nzk0NzY3MDB9.m-Yl4NAve1ZLTSX0YMZh7f3uT84_v2jOKWPtraIZU9Y
  *                     role: 
  *                       type: string 
+ *                       example: client
  *                     email: 
  *                       type: string
+ *                       example: diego.vignau.manjarrez@gmail.com
  *                     firstName: 
  *                       type: string
+ *                       example: Diego Vignau
  *                     phone: 
  *                       type: string
+ *                       example: 5514907030
  */
 routes.post("/", async (req, res) => {
   const {
@@ -69,7 +78,6 @@ routes.post("/", async (req, res) => {
     firstName,
     phone,
   } = req.body;
-
   try {
     const payload = await create({
       email,
@@ -88,7 +96,7 @@ routes.post("/", async (req, res) => {
  * @swagger
  * /user/complete:
  *   put:
- *     summary: creates a new user
+ *     summary: Completes the register information of a user
  *     tags: 
  *       - user
  *     description: 
@@ -140,6 +148,18 @@ routes.post("/", async (req, res) => {
  *                 payload:
  *                   type: object
  *                   properties:
+ *                     pickupInfo:
+ *                       type: object
+ *                       properties:
+ *                         time:
+ *                           type: string
+ *                           example: 8:00-13:00
+ *                         day: 
+ *                           type: string 
+ *                           example: Lunes
+ *                         instructions:
+ *                           type: string
+ *                           example: Tocar el timbre
  *                     address:
  *                       type: object
  *                       properties:
@@ -164,18 +184,6 @@ routes.post("/", async (req, res) => {
  *                         zipcode:
  *                           type: string
  *                           example: 04000
- *                     pickupInfo:
- *                       type: object
- *                       properties:
- *                         time:
- *                           type: string
- *                           example: 8:00-13:00
- *                         day: 
- *                           type: string 
- *                           example: Lunes
- *                         instructions:
- *                           type: string
- *                           example: Tocar el timbre
  */
 routes.put("/complete", authHandler, async (req, res) => {
   let {
@@ -201,7 +209,7 @@ routes.put("/complete", authHandler, async (req, res) => {
     res.status(202).json({ ok:true, payload });
   } catch (error) {
     const { message } = error;
-    res.status(401).json({ ok: true, message });
+    res.status(404).json({ ok: false, message });
   }
 });
 
@@ -224,6 +232,15 @@ routes.put("/complete", authHandler, async (req, res) => {
  *                 payload:
  *                   type: object
  *                   properties:
+ *                     email: 
+ *                       type: string
+ *                       example: diego.vignau.manjarrez@gmail.com
+ *                     firstName:
+ *                       type: string
+ *                       example: Diego Vignau
+ *                     phone:
+ *                       type: string
+ *                       example: 5514907030
  *                     address:
  *                       type: object
  *                       properties:
@@ -248,6 +265,23 @@ routes.put("/complete", authHandler, async (req, res) => {
  *                         zipcode:
  *                           type: string
  *                           example: 04000
+ *                     subscription:
+ *                       type: object
+ *                       properties:
+ *                         packages: 
+ *                           type: array
+ *                           items: 
+ *                             type: object
+ *                             properties:
+ *                               quantity:
+ *                                 type: number
+ *                                 example: 1
+ *                               packageName:
+ *                                 type: string
+ *                                 example: chico
+ *                         startDate: 
+ *                           type: date
+ *                           example: 2023-03-22T08:31:07.000Z
  *                     pickupInfo:
  *                       type: object
  *                       properties:
@@ -260,6 +294,30 @@ routes.put("/complete", authHandler, async (req, res) => {
  *                         instructions:
  *                           type: string
  *                           example: Tocar el timbre
+ *                         nextPickup:
+ *                           type: date
+ *                           example: 2023-03-30T08:31:10.772Z
+ *                     payments: 
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           mes:
+ *                             type: string
+ *                             example: Wed Mar 22 2023 - Sat Apr 22 2023
+ *                           fecha:
+ *                             type: string
+ *                             example: 2023-03-22T08:31:07.000Z
+ *                           monto:
+ *                             type: number
+ *                             example: 100
+ *                           estado:
+ *                             type: string
+ *                             example: open
+ *                           descarga:
+ *                             type: string
+ *                             example: https://pay.stripe.com/invoice/acct_1MdrdQByU3Lz8BC2/test_YWNjdF8xTWRyZFFCeVUzTHo4QkMyLF9OWlc2QTRuOFhhNU9ub1cwekFndE5TNVcwY1FuYVlvLDcwMDE0Njcw0200vpC6NFA7/pdf?s=ap
+ *       
  */
 routes.get("/", authHandler, async (req, res) => {
   const userId = req.params.token.sub;
@@ -269,7 +327,7 @@ routes.get("/", authHandler, async (req, res) => {
     res.status(202).json({ ok: true, payload });
   } catch (error) {
     const { message } = error;
-    res.status(401).json({ ok: false, message });
+    res.status(404).json({ ok: false, message });
   }
 });
 
@@ -365,23 +423,11 @@ routes.get("/allPets", authHandler, async (req, res) => {
   }
 });
 
-routes.get("/nextPickup", authHandler, async (req, res) => {
-  const userId = req.params.token.sub;
-
-  try {
-    const payload = await pickups.getNextPickup(userId);
-    res.status(202).json({ ok: true, payload });
-  } catch (error) {
-    const { message } = error;
-    res.status(401).json({ ok: false, message });
-  }
-});
-
 /**
  * @swagger
  * /user/subscription:
  *   post:
- *     summary: authenticate user
+ *     summary: creates a checkout session for stripe to subscribe
  *     tags: 
  *       - user
  *     description: 
@@ -405,7 +451,7 @@ routes.get("/nextPickup", authHandler, async (req, res) => {
  *                   example: CHICO
  *     responses:
  *       200:
- *         description: token to identify the user       
+ *         description: URL to access checkout for stripe      
  *         content:
  *           application/json:
  *             schema:

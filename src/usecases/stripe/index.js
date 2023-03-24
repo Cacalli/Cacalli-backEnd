@@ -117,6 +117,7 @@ const stripeWebhookEvent = async (body, signature) => {
 };
 
 const addCustomerId = async (data) => {
+  console.log('new cosutmer')
   const { id, email } = data;
   const user = await userUsecases.findByEmail(email);
   const userId = user.id;
@@ -147,7 +148,13 @@ const createPayment = async (data) => {
   const userId = user.id;
   const newPayment = await invoiceUsecases.create({ userId, creationDate: created, total, status, pdf: invoice_pdf, period, paymentStripeId: id });
   return newPayment;
-}
+};
+
+const updatePayment = async (data) => {
+  const { id, status } = data;
+  const updatedInvoice = await invoiceUsecases.update({ paymentStripeId: id, status })
+  return updatedInvoice;
+};
 
 module.exports = {
   stripeWebhookEvent,
