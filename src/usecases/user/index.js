@@ -100,18 +100,22 @@ const makePretty = async (user) => {
             return { quantity: package.quantity, packageName: packageInfo.name, pickupPeriod: packageInfo.pickupPeriod };
         })
       );
+      const userSubscription = {packages: userPackages, startDate: user.subscription.startDate };
     }
-    
+    if(user.pickupInfo != null) {
     const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
     const nextPickup = await pickups.getNextPickup(user.id);
-    if(nextPickup){
-      userPickupInfo.nextPickup = nextPickup.date;
-      userPickupInfo.status = nextPickup.status;
-    }
+      if(nextPickup){
+        userPickupInfo.nextPickup = nextPickup.date;
+        userPickupInfo.status = nextPickup.status;
+      }
     const zone = await usecasesZone.getById(user.pickupInfo.zone);
     userPickupInfo.zone = zone.name;
-    const userSubscription = {packages: userPackages, startDate: user.subscription.startDate };
-    let returnInfo = (({ email, firstName, phone, address }) => ({ email, firstName, phone, address }))(user);
+    }
+    let returnInfo = (({ email, firstName, phone }) => ({ email, firstName, phone }))(user);
+    if(user.address) {
+      returnInfo.address = user.address;
+    }
     returnInfo.subscription = userSubscription;
     returnInfo.pickupInfo = userPickupInfo;
     return returnInfo;
