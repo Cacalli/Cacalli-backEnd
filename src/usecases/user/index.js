@@ -111,16 +111,13 @@ const makePretty = async (user) => {
       userPickupInfo.nextPickup = nextPickup.date;
       userPickupInfo.status = nextPickup.status;
     }
-    console.log('1')
     const zone = await usecasesZone.getById(user.pickupInfo.zone);
     userPickupInfo.zone = zone.name;
     returnInfo.pickupInfo = userPickupInfo;
   }
-  console.log('2')
   if(user.address) {
     returnInfo.address = user.address;
   }
-  console.log('3')
   return returnInfo;
   };
 
