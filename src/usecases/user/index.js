@@ -94,7 +94,7 @@ const authenticate = async (email, password) => {
 
 const makePretty = async (user) => {
   let returnInfo = (({ email, firstName, phone }) => ({ email, firstName, phone }))(user);
-  if(user.subscription.packages.lenght > 0){
+  if(user.subscription.packages.length > 0){
     const userPackages = await Promise.all(
       user.subscription.packages.map(async (package) => {
         const packageInfo = await usecasesPackages.getById(package.packageId);
