@@ -327,7 +327,7 @@ routes.get("/", authHandler, async (req, res) => {
     res.status(202).json({ ok: true, payload });
   } catch (error) {
     const { message } = error;
-    res.status(401).json({ ok: false, message });
+    res.status(404).json({ ok: false, message });
   }
 });
 
