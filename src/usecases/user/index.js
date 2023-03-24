@@ -1,12 +1,13 @@
 const User = require("../../models/user").model;
 const { hashPassword, verifyPassword } = require("../../lib/encrypt");
-const { createToken, verifyToken } = require("../../lib/jwt");
+const { createToken } = require("../../lib/jwt");
 const pets = require("./pets");
 const subscription = require("./subscription");
 const usecasesPickupInfo = require("./pickupInfo");
 const pickups = require("./pickups");
-const zone = require("../zone");
-const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+const usecasesZone = require("../zone");
+const usecasesPackages = require("../package");
+const usecasesInvoice = require("../invoice");
 
 const create = async (data) => {
   const {
@@ -15,7 +16,6 @@ const create = async (data) => {
     firstName,
     phone,
   } = data;
-
   const hash = await hashPassword(password);
   const user = new User({
     email,
@@ -23,7 +23,11 @@ const create = async (data) => {
     firstName,
     phone,
   });
-  return await user.save();
+  const newUser = await user.save();
+  const auth = await authenticate(email, password);
+  const newUserPayload = (({ email, firstName, phone }) => ({ email, firstName, phone }))(newUser);
+  const userAuthenticated = { ...auth, ...newUserPayload };
+  return userAuthenticated;
 };
 
 const findById = async (id) => await User.findById(id);
@@ -32,26 +36,58 @@ const del = async (id) => await User.findByIdAndDelete(id);
 
 const update = async (id, data) => await User.findByIdAndUpdate(id, data, {new: true});
 
-const complete = async (id, data) => {
-  const { address, pickupInfo } = data;
-  pickupInfo.day = await zone.schedules.transformDayToNumber(pickupInfo.day);
-  pickupInfo.time = await zone.schedules.transformScheduleToNumber(pickupInfo.time);
-  updatedUser = await update(id, { address, pickupInfo });
-  return updatedUser;
-}
-
 const findByEmail = async (email) => await User.findOne({ email });
 
-const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId })
+const findByStripeId = async (customerStripeId) => await User.findOne({ customerStripeId });
 
-const getAllClients = async (role) => { 
-  const allUsers = await User.find({role: 'client'});
-  // if(role != 'admin'){
-  //   throw new Error('Admin credentials needed');
-  // } else {
-  //   allUsers = await User.find({role: 'client'});
-  // }
-  return allUsers;
+const complete = async (id, data) => {
+  const { address, pickupInfo } = data;
+  pickupInfo.day = await usecasesZone.schedules.transformDayToNumber(pickupInfo.day);
+  pickupInfo.time = await usecasesZone.schedules.transformScheduleToNumber(pickupInfo.time);
+  pickupInfo.zone = await usecasesZone.getByZipcodeAndSchedule({ day: pickupInfo.day, time: pickupInfo.time, zipcode:address.zipcode });
+  updatedUser = await update(id, { address, pickupInfo });
+  const updatedPickupInfoPretty = { time: usecasesZone.schedules.transformNumberToSchedule(updatedUser.pickupInfo.time), 
+                        day: usecasesZone.schedules.transformNumberToDay(updatedUser.pickupInfo.day),
+                        instructions: pickupInfo.instructions };
+  const updatedAddress = updatedUser.address;
+  const updatedUserPayload = { pickupInfo: updatedPickupInfoPretty, address: updatedAddress};
+  return updatedUserPayload;
+};
+
+const getClients = async (data) => {
+  const query = {role: 'client'};
+  const { zone, day, time, status } = data;
+  if(day) {
+    const dayNumber = usecasesZone.schedules.transformDayToNumber(day);
+    query['pickupInfo.day']= dayNumber;
+  }
+  if(time) {
+    const timeNumber = usecasesZone.schedules.transformScheduleToNumber(time);
+    query['pickupInfo.time'] = timeNumber;
+  }
+  if(zone) {
+    const zoneObject = await usecasesZone.getByName(zone);
+    const zoneId = zoneObject._id;
+    query['pickupInfo.zone'] = zoneId;
+  }
+  let clients = await User.find(query);
+  clients = await Promise.all(
+    clients.map(async (client) => {
+      return makePretty(client);
+    })
+  );
+  clients = clients.sort((a,b) => {
+    if(a.pickupInfo && b.pickupInfo){
+      return new Date(a.pickupInfo.nextPickup) - new Date(b.pickupInfo.nextPickup);
+    } else if(a.pickupInfo) {
+      return -1
+    } else if(b.pickupInfo) {
+      return 1
+    } else {
+      return 0
+    }
+  })
+  return clients;
 };
 
 const authenticate = async (email, password) => {
@@ -64,14 +100,41 @@ const authenticate = async (email, password) => {
   return {token, role: user.role};
 };
 
-const addPaymentMethod = async (paymentMethodId, userId) => {
-  const user = await findById(userId);
-  const customer = user.customerStripeId;
-  const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
-    customer,
-  });
+const makePretty = async (user) => {
+  let returnInfo = (({ email, firstName, phone }) => ({ email, firstName, phone }))(user);
+  if(user.subscription.packages.length > 0){
+    const userPackages = await Promise.all(
+      user.subscription.packages.map(async (package) => {
+        const packageInfo = await usecasesPackages.getById(package.packageId);
+          return { quantity: package.quantity, packageName: packageInfo.name, pickupPeriod: packageInfo.pickupPeriod };
+      })
+    );
+    const userSubscription = {packages: userPackages, startDate: user.subscription.startDate };
+    returnInfo.subscription = userSubscription;
+  }
+  if(user.pickupInfo.day) {
+    const userPickupInfo = { day: usecasesZone.schedules.transformNumberToDay(user.pickupInfo.day), time: usecasesZone.schedules.transformNumberToSchedule(user.pickupInfo.day) };
+    const nextPickup = await pickups.getNextPickup(user.id);
+    if(nextPickup){
+      userPickupInfo.nextPickup = nextPickup.date;
+      userPickupInfo.status = nextPickup.status;
+    }
+    const zone = await usecasesZone.getById(user.pickupInfo.zone);
+    userPickupInfo.zone = zone.name;
+    returnInfo.pickupInfo = userPickupInfo;
+  }
+  if(user.address) {
+    returnInfo.address = user.address;
+  }
+  return returnInfo;
+  };
 
-  return paymentMethod;
+const getUserInfo = async (id) => {
+  let user = await findById(id);
+  const testPayments = await usecasesInvoice.getAllPaymentsByUser({userId: id});
+  const returnInfo = await makePretty(user);
+  returnInfo.payments = testPayments;
+  return returnInfo;
 };
 
 module.exports = {
@@ -83,10 +146,10 @@ module.exports = {
   authenticate,
   findByEmail,
   findByStripeId,
-  getAllClients,
+  getClients,
   pets,
   subscription,
   usecasesPickupInfo,
   pickups,
-  addPaymentMethod,
+  getUserInfo,
 };

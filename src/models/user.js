@@ -7,7 +7,7 @@ const schema = new Schema({
   password: { type: String, required: true, trim: true },
   firstName: { type: String, required: true, trim: true },
   phone: { type: String, required: true, trim: true, unique: true },
-  customerStripeId: { type: String, trim: true, unique: true },
+  customerStripeId: { type: String, trim: true },
   address: {
     street: { type: String, trim: true },
     number: { type: Number },
@@ -15,12 +15,15 @@ const schema = new Schema({
     neighborhood: { type: String },
     municipality: { type: String },
     state: { type: String },
-    zipCode: { type: Number },
+    zipcode: { type: Number },
   },
   subscription: {
-    packages: [{ type: mongoose.ObjectId, ref: "Package" }], //This one still needs to be tested with objects id for packages
-    status: { type: Number, min: 0, max: 2 }, //State 0 is inactive, 1 is active and 2 is pending payment
-    startDate: { type: Date, default: Date.now },
+    packages: [{
+        packageId: { type: mongoose.ObjectId, ref: "Package" },
+        quantity: {type: Number},
+      }], 
+    status: { type: String }, 
+    startDate: { type: Date },
     subscriptionStripeId: { type: String, trim: true },
   },
   pets: [
@@ -35,8 +38,8 @@ const schema = new Schema({
     time: { type: Number, min: 0, max: 23 },
     day: { type: Number, min: 0, max: 6 },
     zone: { type: mongoose.ObjectId, ref: "Zone" }, //This also needs to be tested with reference to another object
+    instructions: { type: String },
   },
-  paymentMethodStripeIds: [{ type: String }],
   role:{type: String, default: 'client'}
 });
 

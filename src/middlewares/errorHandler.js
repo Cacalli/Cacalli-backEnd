@@ -5,9 +5,7 @@ const logErrors = (err, req, res, next) => {
 };
 
 const errorHandler = (err, req, res, next) => {
-  console.log("Error Handler");
   const { message } = err;
-
   res.status(500).json({ ok: false, message });
 };
 

@@ -49,10 +49,22 @@ const getNextWeekDay = (date, weekDay) => {
 
 const getPickupPeriod = async (id) => {
     const user = await User.findById(id);
-    const packageId = user.subscription.packages[0];
+    const packageId = user.subscription.packages[0].packageId;
     const mainPackage = await package.getById(packageId);
     const pickupPeriod = mainPackage.pickupPeriod;
     return pickupPeriod;
+}
+
+const createFirstPickup = async (id) => {
+    const user = await User.findById(id);
+    const now = new Date();
+    let newDate = getNextWeekDay(now, user.pickupInfo.day);
+    const pickupPeriod = await getPickupPeriod(id);
+    if(pickupPeriod == 2){
+        newDate.setDate(newDate.getDate() + 7);
+    }
+    const newPickup = await pickup.create({user: id, date: newDate});
+    return newPickup;
 };
 
 module.exports = {
@@ -61,4 +73,5 @@ module.exports = {
     getAllPickups,
     completePickup,
     delayPickup,
+    createFirstPickup,
 };

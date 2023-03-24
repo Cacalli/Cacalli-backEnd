@@ -14,12 +14,14 @@ const createStripeCheckoutSession = async (data) => {
 };
 
 const updateSubscription = async (data) => {
-  const { userId, status, startDate, subscriptionStripeId } = data;
+  const { userId, status, startDate, subscriptionStripeId, packages } = data;
   const user = await User.findById(userId);
-  if(status) {user.subscription.status = status;}
-  if(startDate) {user.subscription.startDate = startDate;}
+  const formatDate = new Date(startDate*1000);
+  if(status) { user.subscription.status = status; }
+  if(startDate) {user.subscription.startDate = formatDate;}
   if(subscriptionStripeId) {user.subscription.subscriptionStripeId = subscriptionStripeId;}
-  const updatedUser = await User.findByIdAndUpdate(userId, user, { new: true });
+  if(packages) {user.subscription.packages = packages}
+  const updatedUser = await User.findByIdAndUpdate(userId, user);
   return updatedUser;
 };
 
@@ -28,34 +30,6 @@ const checkSubscriptionStatus = async (data) => {
   const user = await User.findById(userId);
   const userSubscriptionStatus = user.subscription.status;
   return userSubscriptionStatus;
-};
-
-const addPackage = async (data) => {
-  const { userId, package } = data;
-  const user = await User.findById(userId);
-  user.subscription.packages.push(package);
-  const updatedUser = await User.findByIdAndUpdate(userId, user, { new: true });
-  return updatedUser;
-};
-
-const removePackage = async (data) => {
-  const { userId, packageIndex } = data;
-  const user = await User.findById(userId);
-  user.subscription.packages.splice(packageIndex, 1);
-  const updatedUser = await User.findByIdAndUpdate(userId, user, { new: true });
-  return updatedUser;
-};
-
-const getAllPackages = async (data) => {
-  const { userId } = data;
-  const user = await User.findById(userId);
-  const packagesIds = user.subscription.packages;
-  const packages = await Promise.all(
-    packagesIds.map(async (packageId) => {
-      return await packageUsecases.getById(packageId);
-    })
-  );
-  return packages;
 };
 
 const getCartPackages = async (data) => {
@@ -69,41 +43,8 @@ const getCartPackages = async (data) => {
   return packages;
 };
 
-const calcTotalFee = async (data) => {
-  const { userId } = data;
-  const user = await User.findById(userId);
-  const remainingPackages = user.subscription.packages;
-  const basePackageId = remainingPackages.shift();
-  const baseFee = await packageUsecases.getFullPrice(basePackageId);
-  const totalFee = await remainingPackages.reduce(async (total, packageId) => {
-    const packageFee = await packageUsecases.getExtraPrice(packageId);
-    const totalFee = (await total) + packageFee;
-    return totalFee;
-  }, baseFee);
-  return totalFee;
-};
-
-const calcInitialFee = async (data) => {
-  const { userId } = data;
-  const user = await User.findById(userId);
-  const totalFee = await user.subscription.packages.reduce(
-    async (total, packageId) => {
-      const packageFee = await packageUsecases.getInitialPrice(packageId);
-      const totalFee = (await total) + packageFee;
-      return totalFee;
-    },
-    0
-  );
-  return totalFee;
-};
-
 module.exports = {
   createStripeCheckoutSession,
   updateSubscription,
   checkSubscriptionStatus,
-  addPackage,
-  removePackage,
-  getAllPackages,
-  calcTotalFee,
-  calcInitialFee,
 };
