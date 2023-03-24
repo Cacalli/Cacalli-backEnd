@@ -77,7 +77,15 @@ const getClients = async (data) => {
     })
   );
   clients = clients.sort((a,b) => {
-    return new Date(a.pickupInfo.nextPickup) - new Date(b.pickupInfo.nextPickup);
+    if(a.pickupInfo && b.pickupInfo){
+      return new Date(a.pickupInfo.nextPickup) - new Date(b.pickupInfo.nextPickup);
+    } else if(a.pickupInfo) {
+      return -1
+    } else if(b.pickupInfo) {
+      return 1
+    } else {
+      return 0
+    }
   })
   return clients;
 };
