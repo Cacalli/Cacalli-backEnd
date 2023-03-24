@@ -109,13 +109,16 @@ const makePretty = async (user) => {
         userPickupInfo.nextPickup = nextPickup.date;
         userPickupInfo.status = nextPickup.status;
       }
+    console.log('1')
     const zone = await usecasesZone.getById(user.pickupInfo.zone);
     userPickupInfo.zone = zone.name;
     }
     let returnInfo = (({ email, firstName, phone }) => ({ email, firstName, phone }))(user);
+    console.log('2')
     if(user.address) {
       returnInfo.address = user.address;
     }
+    console.log('3')
     returnInfo.subscription = userSubscription;
     returnInfo.pickupInfo = userPickupInfo;
     return returnInfo;
@@ -123,11 +126,8 @@ const makePretty = async (user) => {
 
 const getUserInfo = async (id) => {
   let user = await findById(id);
-  console.log(user);
   const testPayments = await usecasesInvoice.getAllPaymentsByUser({userId: id});
-  console.log(testPayments);
   const returnInfo = await makePretty(user);
-  console.log(returnInfo);
   returnInfo.payments = testPayments;
   return returnInfo;
 };
