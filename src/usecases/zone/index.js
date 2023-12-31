@@ -1,6 +1,8 @@
 const Zone = require("../../models/zone").model;
 const schedules = require("./schedules");
 const zipcodes = require("./zipcodes");
+const {readFile} = require('fs/promises');
+// const csv = require('csv-parser');
 
 const create = async (data) => {
     const {name} = data;
@@ -52,16 +54,26 @@ const getSchedules = async (id) => {
 };
 
 const checkZipcode = async (data) => {
-    const {zipcode} = data;
-    const allZones = await Zone.find({});
-    if(allZones.length > 0){
-        const availableZones = allZones.filter(zone => zone.zipcodes.includes(zipcode));
-        const isAvailable = availableZones.length > 0;
-        return {available: isAvailable};
-    } 
-    else {
-        return null;
+    let {zipcode} = data;
+    if(zipcode.length > 0){
+        if(zipcode[0] == "0"){
+            zipcode = zipcode.slice(1);
+        }
     }
+    const zipcodes = await readFile("./cacalliCP.csv", "utf8");
+    const zipcodesArray = zipcodes.split("\n");
+    const zipcodesArrayFiltered = zipcodesArray.filter((item) => item.includes(zipcode));
+    const zipcodeIncluded = zipcodesArrayFiltered.length > 0;
+    return zipcodeIncluded
+    // const allZones = await Zone.find({});
+    // if(allZones.length > 0){
+    //     const availableZones = allZones.filter(zone => zone.zipcodes.includes(zipcode));
+    //     const isAvailable = availableZones.length > 0;
+    //     return {available: isAvailable};
+    // } 
+    // else {
+    //     return null;
+    // }
 };
 
 const getAvailableCombos = async (data) => {

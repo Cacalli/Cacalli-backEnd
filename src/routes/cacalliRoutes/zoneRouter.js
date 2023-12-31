@@ -41,6 +41,7 @@ const routes = Router();
  */
 routes.get("/checkZipcode/:zipcode", async (req, res) => {
   const { zipcode } = req.params;
+  console.log(zipcode)
 
   try {
     const payload = await checkZipcode({ zipcode });
